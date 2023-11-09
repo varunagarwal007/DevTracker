@@ -27,11 +27,12 @@ export const projectRouters = router({
 			if (!user || !user.id) {
 				throw new TRPCError({ code: "UNAUTHORIZED" })
 			}
-			await db.project.create({
+			const res = await db.project.create({
 				data: {
 					title: input.title,
 					userId: ctx.userId,
 				},
 			})
+			return res
 		}),
 })

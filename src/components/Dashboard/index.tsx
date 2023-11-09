@@ -19,15 +19,27 @@ import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 import { useState } from "react"
 import Link from "next/link"
+import { useToast } from "../ui/use-toast"
+import { useRouter } from "next/navigation"
 
 const Dashboard = () => {
 	const { user } = useKindeBrowserClient()
+	const router = useRouter()
 	const { data, isLoading } = trpc.project.getProjects.useQuery()
 
 	const [projectName, setProjectName] = useState<string>("")
+	const { toast } = useToast()
 
 	const { mutate: createProject, isLoading: projectLoader } =
-		trpc.project.createProject.useMutation({})
+		trpc.project.createProject.useMutation({
+			onSuccess: (project) => {
+				toast({
+					description: "Your Project is created Successfully.",
+					variant: "default",
+				})
+				router.push(`/dashboard/${project.id}`)
+			},
+		})
 
 	return (
 		<MaxWidthWrapper className="h-full">
