@@ -10,28 +10,49 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum user_role {
+  user
+  admin
+}
+
 model User {
   id      String    @id @unique @default(cuid())
   email   String?
   Project Project[]
   Issues  Issues[]
+  role    user_role @default(user)
+  avatar  String?
+}
+
+enum project_type {
+  software
 }
 
 model Project {
-  id          String   @id @unique @default(cuid())
+  id          String       @id @unique @default(cuid())
   title       String?
-  admin       User?    @relation(fields: [userId], references: [id])
+  admin       User?        @relation(fields: [userId], references: [id])
   totalIssues Int?
   all_issues  Issues[]
   userId      String?
+  projectType project_type @default(software)
+  picture     String?
+}
+
+enum issue_type {
+  BUG
+  STORY
+  TASK
+  SUBTASK
 }
 
 model Issues {
-  id         String    @id @unique @default(cuid())
-  project_id Project   @relation(fields: [projectId], references: [id])
-  created_at DateTime? @default(now())
-  created_by User?     @relation(fields: [userId], references: [id])
-  updated_at DateTime? @updatedAt
+  id         String     @id @unique @default(cuid())
+  project_id Project    @relation(fields: [projectId], references: [id])
+  created_at DateTime?  @default(now())
+  created_by User?      @relation(fields: [userId], references: [id])
+  updated_at DateTime?  @updatedAt
   projectId  String
   userId     String?
+  type       issue_type @default(BUG)
 }

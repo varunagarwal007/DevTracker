@@ -1,4 +1,5 @@
 import Overview from "@/components/Project/Overview"
+import Timeline from "@/components/Project/Timeline"
 import db from "@/db"
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/dist/server"
 import { notFound, redirect } from "next/navigation"
@@ -23,7 +24,7 @@ const Page = async ({ params }: PageParams) => {
 	})
 
 	if (!project) notFound()
-	return <Overview projectId={pid} />
+	return <Timeline projectId={pid} />
 }
 
 export default Page

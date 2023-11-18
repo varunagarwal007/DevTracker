@@ -21,6 +21,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { useToast } from "../ui/use-toast"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 
 const Dashboard = () => {
 	const { user } = useKindeBrowserClient()
@@ -118,8 +119,14 @@ const Dashboard = () => {
 							>
 								<Link href={`/dashboard/${item.id}`}>
 									<div className="relative m-2 h-64 overflow-hidden rounded-lg bg-primary-foreground border-2 border-primary border-dashed shadow shadow-secondary flex-col">
-										<div className="h-1/2 flex justify-center items-center flex-col space-y-4 border-b">
-											Random Image
+										<div className="h-1/2 flex justify-center items-center flex-col space-y-4 border-b overflow-hidden">
+											<Image
+												width={100}
+												height={100}
+												alt="filler"
+												src="https://api.dicebear.com/7.x/shapes/svg?seed=Chester"
+												className="w-full"
+											/>
 										</div>
 										<div className="flex-col mx-6 py-2">
 											<div className="flex justify-end w-full items-center">

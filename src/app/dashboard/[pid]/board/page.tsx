@@ -1,3 +1,4 @@
+import Board from "@/components/Project/Board"
 import Overview from "@/components/Project/Overview"
 import db from "@/db"
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/dist/server"
@@ -23,7 +24,7 @@ const Page = async ({ params }: PageParams) => {
 	})
 
 	if (!project) notFound()
-	return <Overview projectId={pid} />
+	return <Board projectId={pid} />
 }
 
 export default Page

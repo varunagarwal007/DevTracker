@@ -1,7 +1,7 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/dist/server"
 import { privateProcedure, router } from "../trpc"
 import { TRPCError } from "@trpc/server"
-import { db } from "@/db"
+import db from "@/db"
 import { z } from "zod"
 
 export const projectRouters = router({
@@ -33,6 +33,18 @@ export const projectRouters = router({
 					userId: ctx.userId,
 				},
 			})
+			return res
+		}),
+	getProjectDetail: privateProcedure
+		.input(z.object({ id: z.string() }))
+		.query(async ({ ctx, input }) => {
+			const res = await db.project.findFirst({
+				where: {
+					id: input.id,
+				},
+			})
+			if (!res)
+				throw new TRPCError({ code: "NOT_FOUND", message: "Project Not found" })
 			return res
 		}),
 })

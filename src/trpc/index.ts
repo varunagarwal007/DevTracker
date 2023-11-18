@@ -3,8 +3,9 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/dist/server"
 import { router } from "./trpc"
 import { publicProcedure } from "./trpc"
 import { TRPCError } from "@trpc/server"
-import { db } from "@/db"
+import db from "@/db"
 import { projectRouters } from "./routers/project"
+import { getUserAvatar } from "@/lib/functions/functions"
 
 export const appRouter = router({
 	authCallback: publicProcedure.query(async () => {
@@ -24,6 +25,7 @@ export const appRouter = router({
 				data: {
 					id: user.id,
 					email: user.email,
+					avatar: getUserAvatar(),
 				},
 			})
 		}

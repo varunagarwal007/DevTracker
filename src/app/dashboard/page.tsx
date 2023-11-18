@@ -1,5 +1,5 @@
 import Dashboard from "@/components/Dashboard"
-import { db } from "@/db"
+import db from "@/db"
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/dist/server"
 import { redirect } from "next/navigation"
 import React from "react"
