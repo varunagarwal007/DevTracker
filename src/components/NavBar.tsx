@@ -8,7 +8,7 @@ import { LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs"
 
 const NavBar = () => {
 	return (
-		<nav className="sticky h-20 inset-x-0 top-0 z-30 w-full border-b border-gray-200 bg-white/75 backdrop-blur-lg transition-all">
+		<nav className="sticky h-20 inset-x-0 top-0 z-30 w-full border-b border-gray-200 backdrop-blur-lg transition-all">
 			<MaxWidthWrapper>
 				<div className="flex h-20 items-center justify-between border-b border-zinc-200">
 					<Link href="/" className="flex z-40 font-bold relative text-2xl">
@@ -16,7 +16,7 @@ const NavBar = () => {
 						<span className="sr-only">DevTracker</span>
 						<span>Dev</span>
 						<span className="text-primary">Tracker</span>
-						<sup className="absolute left-[calc(100%+.1rem)] top-0 text-xs font-bold text-black">
+						<sup className="absolute left-[calc(100%+.1rem)] top-0 text-xs font-bold ">
 							[Beta]
 						</sup>
 					</Link>

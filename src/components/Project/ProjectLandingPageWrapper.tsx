@@ -3,6 +3,7 @@ import { trpc } from "@/app/_trpc/client"
 import { cn } from "@/lib/utils"
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs"
 import {
+	Calendar,
 	ChevronsUpDown,
 	Clipboard,
 	Code2,
@@ -24,6 +25,9 @@ import {
 import { Separator } from "../ui/separator"
 import { Skeleton } from "../ui/skeleton"
 import { ReactElement, ReactNode, useState } from "react"
+import { Switch } from "../ui/switch"
+import { useTheme } from "next-themes"
+import { Label } from "../ui/label"
 
 interface ProjectPageWrapper {
 	projectId: string
@@ -40,6 +44,7 @@ const ProjectLandingPage = (props: ProjectPageWrapper) => {
 
 	const [isPlanningOpen, setIsPlanningOpen] = useState<boolean>(false)
 	const [isDevOpen, setIsDevOpen] = useState<boolean>(false)
+	const { setTheme, theme } = useTheme()
 
 	if (isLoading || !data) {
 		return <Skeleton />
@@ -47,7 +52,7 @@ const ProjectLandingPage = (props: ProjectPageWrapper) => {
 
 	return (
 		<div className="m-5 ">
-			<div className="flex h-[100vh]">
+			<div className="flex h-[85vh]">
 				<aside className="hidden md:block md:w-[8rem] lg:w-[16rem]">
 					<div className="flex-col my-8">
 						<div className="my-4 flex items-center">
@@ -84,8 +89,8 @@ const ProjectLandingPage = (props: ProjectPageWrapper) => {
 							<Collapsible
 								className="space-y-2 w-full"
 								open={
-									pathName.includes("timeline") ||
-									pathName.includes("board") ||
+									(pathName.includes("timeline") ||
+										pathName.includes("board")) &&
 									isPlanningOpen
 								}
 								onOpenChange={() => setIsPlanningOpen((f) => !f)}
@@ -182,22 +187,28 @@ const ProjectLandingPage = (props: ProjectPageWrapper) => {
 								<span className="font-medium text-xs">Document</span>
 							</div>
 							<div className="rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100">
+								<Calendar className="h-5 w-5 mx-2 " />
+								<span className="font-medium text-xs">Calender</span>
+							</div>
+							<div className="rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100">
 								<Settings className="h-5 w-5 mx-2 " />
 								<span className="font-medium text-xs ">Settings</span>
 							</div>
 							<div className="rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100">
-								<Settings className="h-5 w-5 mx-2 " />
-								<span className="font-medium text-xs"></span>
+								<Switch
+									id="airplane-mode"
+									onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+								/>
+								<Label htmlFor="airplane-mode">Toggle Theme</Label>
 							</div>
 						</div>
 					</div>
 				</aside>
-				<Separator
-					orientation="vertical"
-					className="mx-2 w-[3px] hidden md:block"
-				/>
+				<Separator orientation="vertical" className="mx-2 w-[3px] " />
 
-				<main className="flex-1">{props.children}</main>
+				<main className="flex-1 h-full">
+					<div className="m-8">{props.children}</div>
+				</main>
 			</div>
 		</div>
 	)

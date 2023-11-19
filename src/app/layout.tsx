@@ -5,6 +5,7 @@ import NavBar from "@/components/NavBar"
 import Providers from "@/components/Providers"
 import { Toaster } from "@/components/ui/toaster"
 import { cn } from "@/lib/utils"
+import { ThemeProvider } from "@/components/theme-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -22,9 +23,16 @@ export default function RootLayout({
 		<html lang="en">
 			<Providers>
 				<body className={cn(inter.className, "min-h-screen")}>
-					<NavBar />
-					{children}
-					<Toaster />
+					<ThemeProvider
+						attribute="class"
+						defaultTheme="system"
+						enableSystem
+						disableTransitionOnChange
+					>
+						<NavBar />
+						{children}
+						<Toaster />
+					</ThemeProvider>
 				</body>
 			</Providers>
 		</html>
