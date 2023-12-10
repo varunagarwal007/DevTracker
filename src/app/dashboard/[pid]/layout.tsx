@@ -1,5 +1,14 @@
 "use client"
 import { trpc } from "@/app/_trpc/client"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+import { Separator } from "@/components/ui/separator"
+import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs"
 import {
@@ -9,35 +18,27 @@ import {
 	Code2,
 	GanttChart,
 	Home,
+	Moon,
 	Newspaper,
 	PlusSquare,
 	Settings,
+	Sun,
 } from "lucide-react"
+import { useTheme } from "next-themes"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
-import { Button } from "../ui/button"
-import {
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
-} from "../ui/collapsible"
-import { Separator } from "../ui/separator"
-import { Skeleton } from "../ui/skeleton"
-import { ReactElement, ReactNode, useState } from "react"
-import { Switch } from "../ui/switch"
-import { useTheme } from "next-themes"
-import { Label } from "../ui/label"
-
-interface ProjectPageWrapper {
-	projectId: string
-	children: ReactNode
-}
-
-const ProjectLandingPage = (props: ProjectPageWrapper) => {
-	const { projectId } = props
+import { useState } from "react"
+export default function DashboardLayout({
+	children,
+}: {
+	children: React.ReactNode
+}) {
+	const projectId = "clp6u4a2m0001ul8skbptcb1y"
 	const { user } = useKindeBrowserClient()
 	const pathName = usePathname()
+	if (!projectId || typeof projectId !== "string") {
+		return
+	}
 	const { data, isLoading } = trpc.project.getProjectDetail.useQuery({
 		id: projectId,
 	})
@@ -49,10 +50,9 @@ const ProjectLandingPage = (props: ProjectPageWrapper) => {
 	if (isLoading || !data) {
 		return <Skeleton />
 	}
-
 	return (
-		<div className="m-5 ">
-			<div className="flex h-[85vh]">
+		<div className="m-auto max-w-screen-2xl">
+			<div className="flex h-auto">
 				<aside className="hidden md:block md:w-[8rem] lg:w-[16rem]">
 					<div className="flex-col my-8">
 						<div className="my-4 flex items-center">
@@ -194,12 +194,18 @@ const ProjectLandingPage = (props: ProjectPageWrapper) => {
 								<Settings className="h-5 w-5 mx-2 " />
 								<span className="font-medium text-xs ">Settings</span>
 							</div>
-							<div className="rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100">
-								<Switch
-									id="airplane-mode"
-									onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-								/>
-								<Label htmlFor="airplane-mode">Toggle Theme</Label>
+							<div
+								className="rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100"
+								onClick={() => {
+									theme === "light" ? setTheme("dark") : setTheme("light")
+								}}
+							>
+								{theme === "light" ? (
+									<Sun className="h-5 w-5 mx-2 " />
+								) : (
+									<Moon className="h-5 w-5 mx-2 " />
+								)}
+								<span className="font-medium text-xs ">Toggle theme</span>
 							</div>
 						</div>
 					</div>
@@ -207,11 +213,9 @@ const ProjectLandingPage = (props: ProjectPageWrapper) => {
 				<Separator orientation="vertical" className="mx-2 w-[3px] " />
 
 				<main className="flex-1 h-full">
-					<div className="m-8">{props.children}</div>
+					<div className="m-8 h-full">{children}</div>
 				</main>
 			</div>
 		</div>
 	)
 }
-
-export default ProjectLandingPage

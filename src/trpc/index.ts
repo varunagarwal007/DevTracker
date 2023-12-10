@@ -1,11 +1,10 @@
-import { userRouters } from "./routers/user"
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/dist/server"
-import { router } from "./trpc"
-import { publicProcedure } from "./trpc"
-import { TRPCError } from "@trpc/server"
 import db from "@/db"
-import { projectRouters } from "./routers/project"
 import { getUserAvatar } from "@/lib/functions/functions"
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/dist/server"
+import { TRPCError } from "@trpc/server"
+import { projectRouters } from "./routers/project"
+import { userRouters } from "./routers/user"
+import { publicProcedure, router } from "./trpc"
 
 export const appRouter = router({
 	authCallback: publicProcedure.query(async () => {

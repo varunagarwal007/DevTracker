@@ -47,7 +47,7 @@ const Dashboard = () => {
 			<div className="my-8 h-full flex flex-col space-y-2">
 				<div className="flex justify-between mb-5 flex-col md:flex-row md:flex-auto">
 					<span className="text-3xl font-medium ">Your Projects</span>
-					<div className=" flex border rounded-sm p-2 text-sm  border-amber-500 bg-amber-100">
+					<div className=" flex border rounded-sm p-2 text-sm border-primary border-dashed bg-accent">
 						<p className="leading-relaxed tracking-wide">
 							<span className="font-semibold">Pricing now available! </span>
 							<span>Head to the </span>
@@ -118,8 +118,8 @@ const Dashboard = () => {
 								key={index}
 							>
 								<Link href={`/dashboard/${item.id}`}>
-									<div className="relative m-2 h-64 overflow-hidden rounded-lg bg-primary-foreground border-2 border-primary border-dashed shadow shadow-secondary flex-col">
-										<div className="h-1/2 flex justify-center items-center flex-col space-y-4 border-b overflow-hidden">
+									<div className="relative m-2 h-64 overflow-hidden rounded-lg bg-accent border-2 border-primary border-dashed shadow shadow-secondary flex-col">
+										<div className="h-1/2 flex justify-center items-center flex-col space-y-4 border-b overflow-hidden ">
 											<Image
 												width={100}
 												height={100}
@@ -149,7 +149,7 @@ const Dashboard = () => {
 						<Dialog>
 							<DialogTrigger asChild>
 								<li className="col-span-1 w-full max-w-sm cursor-pointer">
-									<div className="relative m-2 h-64 flex-col overflow-hidden rounded-lg bg-primary-foreground border-2 border-primary border-dashed shadow shadow-secondary flex justify-center items-center">
+									<div className="relative m-2 h-64 flex-col overflow-hidden rounded-lg bg-accent border-2 border-primary border-dashed shadow shadow-secondary flex justify-center items-center">
 										<div className="h-1/2 flex justify-center items-center flex-col space-y-4">
 											<span className="text-muted-foreground">
 												Create New Project
@@ -201,5 +201,4 @@ const Dashboard = () => {
 		</MaxWidthWrapper>
 	)
 }
-
 export default Dashboard

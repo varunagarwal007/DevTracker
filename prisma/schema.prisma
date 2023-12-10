@@ -46,13 +46,31 @@ enum issue_type {
   SUBTASK
 }
 
+enum issue_status {
+  NEW
+  ACTIVE
+  RESOLVED
+  CLOSED
+}
+
+enum issue_labels {
+  Design
+  Development
+  DevOps
+  FrontEnd
+  Backend
+}
+
 model Issues {
-  id         String     @id @unique @default(cuid())
-  project_id Project    @relation(fields: [projectId], references: [id])
-  created_at DateTime?  @default(now())
-  created_by User?      @relation(fields: [userId], references: [id])
-  updated_at DateTime?  @updatedAt
-  projectId  String
-  userId     String?
-  type       issue_type @default(BUG)
+  id         String    @id @unique @default(cuid())
+  project_id Project   @relation(fields: [projectId], references: [id])
+  created_at DateTime? @default(now())
+  created_by User?     @relation(fields: [userId], references: [id])
+  updated_at DateTime? @updatedAt
+
+  projectId String
+  userId    String?
+  type      issue_type    @default(BUG)
+  status    issue_status  @default(NEW)
+  labels    issue_labels?
 }

@@ -39,3 +39,5 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 2. Set the provider of the datasource block in schema.prisma to match your database: postgresql, mysql, sqlite, sqlserver, mongodb or cockroachdb.
 3. Run npx prisma db pull to turn your database schema into a Prisma schema.
 4. Run npx prisma generate to generate the Prisma Client. You can then start querying your database.
+
+https://www.youtube.com/watch?v=IZ3w2PNh-hE

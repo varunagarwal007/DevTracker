@@ -1,105 +1,441 @@
-"use client"
-
-import React, { useEffect, useState } from "react"
-
-import { Draggable, DropResult, Droppable } from "react-beautiful-dnd"
-import { cardsData } from "./rawdata"
-import { DndContext } from "./DndContext"
-import { NextPage } from "next"
-
+import {
+	DndContext,
+	DragEndEvent,
+	DragMoveEvent,
+	DragOverlay,
+	DragStartEvent,
+	KeyboardSensor,
+	PointerSensor,
+	UniqueIdentifier,
+	closestCorners,
+	rectIntersection,
+	useSensor,
+	useSensors,
+} from "@dnd-kit/core"
+import React, { useId, useState } from "react"
+import Columns from "./Columns"
+import {
+	SortableContext,
+	arrayMove,
+	sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable"
+import Card from "./Card"
+import { IssueStatus } from "@/lib/constants/ClientConstants"
 interface Cards {
-	id: number
 	title: string
-	components: {
-		id: number
-		name: string
+	id: string
+	parent: string
+}
+type DNDType = {
+	id: UniqueIdentifier
+	title: string
+	items: {
+		id: UniqueIdentifier
+		title: string
 	}[]
 }
-const TaskBoard: NextPage = () => {
-	const [data, setData] = useState<Cards[] | []>([])
-	const [isBrowser, setIsBrowser] = useState(false)
 
-	const onDragEnd = (result: DropResult) => {
-		const { source, destination } = result
-		if (!destination) return
-		if (source.droppableId !== destination.droppableId) {
-			const newData = [...JSON.parse(JSON.stringify(data))] //shallow copy concept
-			const oldDroppableIndex = newData.findIndex(
-				(x) => x.id == source.droppableId.split("droppable")[1]
+const TaskBoard = () => {
+	let demoCol = [
+		...IssueStatus.map((i) => ({
+			id: `${useId()}-container`,
+			title: i.title,
+			items: i.items,
+		})),
+	]
+
+	const [containers, setContainers] = useState<DNDType[]>(demoCol)
+	const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null)
+
+	const sensors = useSensors(
+		useSensor(PointerSensor),
+		useSensor(KeyboardSensor, {
+			coordinateGetter: sortableKeyboardCoordinates,
+		})
+	)
+
+	function handleDragStart(event: DragStartEvent) {
+		const { active } = event
+		const { id } = active
+		setActiveId(id)
+	}
+	/*
+	  const handleDragMove = (event: DragMoveEvent) => {
+		const { active, over } = event;
+	
+		// Handle Items Sorting
+		if (
+		  active.id.toString().includes('item') &&
+		  over?.id.toString().includes('item') &&
+		  active &&
+		  over &&
+		  active.id !== over.id
+		) {
+		  // Find the active container and over container
+		  const activeContainer = findValueOfItems(active.id, 'item');
+		  const overContainer = findValueOfItems(over.id, 'item');
+	
+		  // If the active or over container is not found, return
+		  if (!activeContainer || !overContainer) return;
+	
+		  // Find the index of the active and over container
+		  const activeContainerIndex = containers.findIndex(
+			(container) => container.id === activeContainer.id,
+		  );
+		  const overContainerIndex = containers.findIndex(
+			(container) => container.id === overContainer.id,
+		  );
+	
+		  // Find the index of the active and over item
+		  const activeitemIndex = activeContainer.items.findIndex(
+			(item) => item.id === active.id,
+		  );
+		  const overitemIndex = overContainer.items.findIndex(
+			(item) => item.id === over.id,
+		  );
+		  // In the same container
+		  if (activeContainerIndex === overContainerIndex) {
+			let newItems = [...containers];
+			newItems[activeContainerIndex].items = arrayMove(
+			  newItems[activeContainerIndex].items,
+			  activeitemIndex,
+			  overitemIndex,
+			);
+	
+			setContainers(newItems);
+		  } else {
+			// In different containers
+			let newItems = [...containers];
+			const [removeditem] = newItems[activeContainerIndex].items.splice(
+			  activeitemIndex,
+			  1,
+			);
+			newItems[overContainerIndex].items.splice(
+			  overitemIndex,
+			  0,
+			  removeditem,
+			);
+			setContainers(newItems);
+		  }
+		}
+	
+		// Handling Item Drop Into a Container
+		if (
+		  active.id.toString().includes('item') &&
+		  over?.id.toString().includes('container') &&
+		  active &&
+		  over &&
+		  active.id !== over.id
+		) {
+		  // Find the active and over container
+		  const activeContainer = findValueOfItems(active.id, 'item');
+		  const overContainer = findValueOfItems(over.id, 'container');
+	
+		  // If the active or over container is not found, return
+		  if (!activeContainer || !overContainer) return;
+	
+		  // Find the index of the active and over container
+		  const activeContainerIndex = containers.findIndex(
+			(container) => container.id === activeContainer.id,
+		  );
+		  const overContainerIndex = containers.findIndex(
+			(container) => container.id === overContainer.id,
+		  );
+	
+		  // Find the index of the active and over item
+		  const activeitemIndex = activeContainer.items.findIndex(
+			(item) => item.id === active.id,
+		  );
+	
+		  // Remove the active item from the active container and add it to the over container
+		  let newItems = [...containers];
+		  const [removeditem] = newItems[activeContainerIndex].items.splice(
+			activeitemIndex,
+			1,
+		  );
+		  newItems[overContainerIndex].items.push(removeditem);
+		  setContainers(newItems);
+		}
+	  };
+	  */
+	function findValueOfItems(id: UniqueIdentifier | undefined, type: string) {
+		if (type === "container") {
+			return containers.find((item) => item.id === id)
+		}
+		if (type === "item") {
+			return containers.find((container) =>
+				container.items.find((item) => item.id === id)
 			)
-			const newDroppableIndex = newData.findIndex(
-				(x) => x.id == destination.droppableId.split("droppable")[1]
+		}
+	}
+
+	const findItemTitle = (id: UniqueIdentifier | undefined) => {
+		const container = findValueOfItems(id, "item")
+		if (!container) return ""
+		const item = container.items.find((item) => item.id === id)
+		if (!item) return ""
+		return item.title
+	}
+
+	const findContainerTitle = (id: UniqueIdentifier | undefined) => {
+		const container = findValueOfItems(id, "container")
+		if (!container) return ""
+		return container.title
+	}
+
+	const findContainerItems = (id: UniqueIdentifier | undefined) => {
+		const container = findValueOfItems(id, "container")
+		if (!container) return []
+		return container.items
+	}
+
+	const handleDragMove = (event: DragMoveEvent) => {
+		const { active, over } = event
+
+		// Handle Items Sorting
+		if (
+			active.id.toString().includes("item") &&
+			over?.id.toString().includes("item") &&
+			active &&
+			over &&
+			active.id !== over.id
+		) {
+			// Find the active container and over container
+			const activeContainer = findValueOfItems(active.id, "item")
+			const overContainer = findValueOfItems(over.id, "item")
+
+			// If the active or over container is not found, return
+			if (!activeContainer || !overContainer) return
+
+			// Find the index of the active and over container
+			const activeContainerIndex = containers.findIndex(
+				(container) => container.id === activeContainer.id
 			)
-			const [item] = newData[oldDroppableIndex].components.splice(
-				source.index,
+			const overContainerIndex = containers.findIndex(
+				(container) => container.id === overContainer.id
+			)
+
+			// Find the index of the active and over item
+			const activeitemIndex = activeContainer.items.findIndex(
+				(item) => item.id === active.id
+			)
+			const overitemIndex = overContainer.items.findIndex(
+				(item) => item.id === over.id
+			)
+			// In the same container
+			if (activeContainerIndex === overContainerIndex) {
+				let newItems = [...containers]
+				newItems[activeContainerIndex].items = arrayMove(
+					newItems[activeContainerIndex].items,
+					activeitemIndex,
+					overitemIndex
+				)
+
+				setContainers(newItems)
+			} else {
+				// In different containers
+				let newItems = [...containers]
+				const [removeditem] = newItems[activeContainerIndex].items.splice(
+					activeitemIndex,
+					1
+				)
+				newItems[overContainerIndex].items.splice(overitemIndex, 0, removeditem)
+				setContainers(newItems)
+			}
+		}
+
+		// Handling Item Drop Into a Container
+		if (
+			active.id.toString().includes("item") &&
+			over?.id.toString().includes("container") &&
+			active &&
+			over &&
+			active.id !== over.id
+		) {
+			// Find the active and over container
+			const activeContainer = findValueOfItems(active.id, "item")
+			const overContainer = findValueOfItems(over.id, "container")
+
+			// If the active or over container is not found, return
+			if (!activeContainer || !overContainer) return
+
+			// Find the index of the active and over container
+			const activeContainerIndex = containers.findIndex(
+				(container) => container.id === activeContainer.id
+			)
+			const overContainerIndex = containers.findIndex(
+				(container) => container.id === overContainer.id
+			)
+
+			// Find the index of the active and over item
+			const activeitemIndex = activeContainer.items.findIndex(
+				(item) => item.id === active.id
+			)
+
+			// Remove the active item from the active container and add it to the over container
+			let newItems = [...containers]
+			const [removeditem] = newItems[activeContainerIndex].items.splice(
+				activeitemIndex,
 				1
 			)
-			newData[newDroppableIndex].components.splice(destination.index, 0, item)
-			setData([...newData])
-		} else {
-			const newData = [...JSON.parse(JSON.stringify(data))] //shallow copy concept
-			const droppableIndex = newData.findIndex(
-				(x) => x.id == source.droppableId.split("droppable")[1]
+			newItems[overContainerIndex].items.push(removeditem)
+			setContainers(newItems)
+		}
+	}
+
+	// This is the function that handles the sorting of the containers and items when the user is done dragging.
+	function handleDragEnd(event: DragEndEvent) {
+		const { active, over } = event
+		console.log(event)
+
+		// Handling Container Sorting
+		if (
+			active.id.toString().includes("container") &&
+			over?.id.toString().includes("container") &&
+			active &&
+			over &&
+			active.id !== over.id
+		) {
+			// Find the index of the active and over container
+			const activeContainerIndex = containers.findIndex(
+				(container) => container.id === active.id
 			)
-			const [item] = newData[droppableIndex].components.splice(source.index, 1)
-			newData[droppableIndex].components.splice(destination.index, 0, item)
-			setData([...newData])
+			const overContainerIndex = containers.findIndex(
+				(container) => container.id === over.id
+			)
+			// Swap the active and over container
+			let newItems = [...containers]
+			newItems = arrayMove(newItems, activeContainerIndex, overContainerIndex)
+			setContainers(newItems)
 		}
-	}
-	useEffect(() => {
-		setData(cardsData)
-		if (typeof window !== "undefined") {
-			setIsBrowser(true)
+
+		// Handling item Sorting
+		if (
+			active.id.toString().includes("item") &&
+			over?.id.toString().includes("item") &&
+			active &&
+			over &&
+			active.id !== over.id
+		) {
+			// Find the active and over container
+			const activeContainer = findValueOfItems(active.id, "item")
+			const overContainer = findValueOfItems(over.id, "item")
+
+			// If the active or over container is not found, return
+			if (!activeContainer || !overContainer) return
+			// Find the index of the active and over container
+			const activeContainerIndex = containers.findIndex(
+				(container) => container.id === activeContainer.id
+			)
+			const overContainerIndex = containers.findIndex(
+				(container) => container.id === overContainer.id
+			)
+			// Find the index of the active and over item
+			const activeitemIndex = activeContainer.items.findIndex(
+				(item) => item.id === active.id
+			)
+			const overitemIndex = overContainer.items.findIndex(
+				(item) => item.id === over.id
+			)
+
+			// In the same container
+			if (activeContainerIndex === overContainerIndex) {
+				let newItems = [...containers]
+				newItems[activeContainerIndex].items = arrayMove(
+					newItems[activeContainerIndex].items,
+					activeitemIndex,
+					overitemIndex
+				)
+				setContainers(newItems)
+			} else {
+				// In different containers
+				let newItems = [...containers]
+				const [removeditem] = newItems[activeContainerIndex].items.splice(
+					activeitemIndex,
+					1
+				)
+				newItems[overContainerIndex].items.splice(overitemIndex, 0, removeditem)
+				setContainers(newItems)
+			}
 		}
-	}, [])
-	if (!data.length) {
-		return <h1>Loading</h1>
+		// Handling item dropping into Container
+		if (
+			active.id.toString().includes("item") &&
+			over?.id.toString().includes("container") &&
+			active &&
+			over &&
+			active.id !== over.id
+		) {
+			// Find the active and over container
+			const activeContainer = findValueOfItems(active.id, "item")
+			const overContainer = findValueOfItems(over.id, "container")
+
+			// If the active or over container is not found, return
+			if (!activeContainer || !overContainer) return
+			// Find the index of the active and over container
+			const activeContainerIndex = containers.findIndex(
+				(container) => container.id === activeContainer.id
+			)
+			const overContainerIndex = containers.findIndex(
+				(container) => container.id === overContainer.id
+			)
+			// Find the index of the active and over item
+			const activeitemIndex = activeContainer.items.findIndex(
+				(item) => item.id === active.id
+			)
+
+			let newItems = [...containers]
+			const [removeditem] = newItems[activeContainerIndex].items.splice(
+				activeitemIndex,
+				1
+			)
+			newItems[overContainerIndex].items.push(removeditem)
+			setContainers(newItems)
+		}
+		setActiveId(null)
 	}
+
 	return (
-		<div className="rounded-md border-2 border-primary w-full h-full p-3">
-			<DndContext onDragEnd={onDragEnd}>
-				<React.StrictMode>
-					{isBrowser ? (
-						<div className="flex gap-4 justify-between my-20 mx-4 flex-col lg:flex-row">
-							{data.map((val, index) => {
-								return (
-									<Droppable key={index} droppableId={`droppable${index}`}>
-										{(provided) => (
-											<div
-												className="p-5 lg:w-1/3 w-full bg-white  border-gray-400 border border-dashed"
-												{...provided.droppableProps}
-												ref={provided.innerRef}
-											>
-												<h2 className="text-center font-bold mb-6 text-black">
-													{val.title}
-												</h2>
-												{val.components?.map((component, index) => (
-													<Draggable
-														key={component.id}
-														draggableId={component.id.toString()}
-														index={index}
-													>
-														{(provided) => (
-															<div
-																className="bg-gray-200 mx-1 px-4 py-3 my-3"
-																{...provided.dragHandleProps}
-																{...provided.draggableProps}
-																ref={provided.innerRef}
-															>
-																{component.name}
-															</div>
-														)}
-													</Draggable>
-												))}
-												{provided.placeholder}
-											</div>
-										)}
-									</Droppable>
-								)
-							})}
-						</div>
-					) : null}
-				</React.StrictMode>
+		<div className="grid grid-cols-4 gap-2 md:gap-6 ">
+			<DndContext
+				sensors={sensors}
+				collisionDetection={closestCorners}
+				onDragStart={handleDragStart}
+				onDragMove={handleDragMove}
+				onDragEnd={handleDragEnd}
+			>
+				<SortableContext items={containers.map((i) => i.id)}>
+					{containers.map((container) => (
+						<Columns
+							id={container.id}
+							title={container.title}
+							key={container.id}
+							onAddItem={() => {}}
+						>
+							<SortableContext items={container.items.map((i) => i.id)}>
+								<div className="flex items-start flex-col gap-y-3">
+									{container.items.map((i) => (
+										<Card title={i.title} id={i.id} key={i.id} />
+									))}
+								</div>
+							</SortableContext>
+						</Columns>
+					))}
+				</SortableContext>
+				<DragOverlay adjustScale={false}>
+					{/* Drag Overlay For item Item */}
+					{activeId && activeId.toString().includes("item") && (
+						<Card id={activeId} title={findItemTitle(activeId)} />
+					)}
+					{/* Drag Overlay For Container */}
+					{activeId && activeId.toString().includes("container") && (
+						<Columns id={activeId} title={findContainerTitle(activeId)}>
+							{findContainerItems(activeId).map((i) => (
+								<Card key={i.id} title={i.title} id={i.id} />
+							))}
+						</Columns>
+					)}
+				</DragOverlay>
 			</DndContext>
 		</div>
 	)

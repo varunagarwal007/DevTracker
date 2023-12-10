@@ -1,13 +1,7 @@
 "use client"
 
-import ProjectLandingPage from "./ProjectLandingPageWrapper"
-
 const Overview = ({ projectId }: { projectId: string }) => {
-	return (
-		<>
-			<ProjectLandingPage projectId={projectId}>Overview</ProjectLandingPage>
-		</>
-	)
+	return <div>This page will have all the Overview</div>
 }
 
 export default Overview
