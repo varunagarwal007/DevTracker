@@ -26,30 +26,41 @@ import {
 } from "lucide-react"
 import { useTheme } from "next-themes"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { notFound, usePathname } from "next/navigation"
 import { useState } from "react"
+interface PageParams {
+	pid: string
+}
 export default function DashboardLayout({
 	children,
+	params,
 }: {
 	children: React.ReactNode
+	params: PageParams
 }) {
-	const projectId = "clp6u4a2m0001ul8skbptcb1y"
+	const projectId = params.pid
 	const { user } = useKindeBrowserClient()
 	const pathName = usePathname()
-	if (!projectId || typeof projectId !== "string") {
-		return
-	}
-	const { data, isLoading } = trpc.project.getProjectDetail.useQuery({
-		id: projectId,
-	})
+
+	// if (!user || !user.id)
+	// 	redirect(`/auth-callback?origin=dashboard/${projectId}`)
+
+	const { data, isLoading, isError } = trpc.project.getProjectById.useQuery(
+		{
+			id: projectId,
+		},
+		{
+			staleTime: 5 * 60 * 60 * 1000,
+		}
+	)
 
 	const [isPlanningOpen, setIsPlanningOpen] = useState<boolean>(false)
 	const [isDevOpen, setIsDevOpen] = useState<boolean>(false)
 	const { setTheme, theme } = useTheme()
 
-	if (isLoading || !data) {
-		return <Skeleton />
-	}
+	if (isError) notFound()
+	if (isLoading || !data) return <Skeleton />
+
 	return (
 		<div className="m-auto max-w-screen-2xl">
 			<div className="flex h-auto">
@@ -93,6 +104,7 @@ export default function DashboardLayout({
 										pathName.includes("board")) &&
 									isPlanningOpen
 								}
+								defaultOpen={true}
 								onOpenChange={() => setIsPlanningOpen((f) => !f)}
 							>
 								<div className="flex items-center justify-between space-x-4 px-4 w-full group cursor-pointer ">
@@ -125,7 +137,7 @@ export default function DashboardLayout({
 										<span className="font-medium text-xs ">Board</span>
 									</Link>
 									<Link
-										href={`/dashboard/${projectId}/timeline`}
+										href={"#"}
 										className={cn(
 											"rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100",
 											{
@@ -155,6 +167,7 @@ export default function DashboardLayout({
 							<Collapsible
 								className="w-full space-y-2"
 								open={pathName.includes("code") || isDevOpen}
+								defaultOpen={true}
 								onOpenChange={() => setIsDevOpen((f) => !f)}
 							>
 								<div className="flex items-center justify-between space-x-4 px-4 w-full group cursor-pointer">

@@ -1,3 +1,4 @@
+import { issueRouters } from "./routers/issues"
 import db from "@/db"
 import { getUserAvatar } from "@/lib/functions/functions"
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/dist/server"
@@ -25,6 +26,7 @@ export const appRouter = router({
 					id: user.id,
 					email: user.email,
 					avatar: getUserAvatar(),
+					name: user?.first_name || user.email,
 				},
 			})
 		}
@@ -33,6 +35,7 @@ export const appRouter = router({
 	}),
 	user: userRouters,
 	project: projectRouters,
+	issue: issueRouters,
 })
 
 export type AppRouter = typeof appRouter

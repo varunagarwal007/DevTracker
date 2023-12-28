@@ -135,12 +135,8 @@ const Dashboard = () => {
 												</span>
 												<Settings2 className="w-4 h-4 text-secondary-foreground" />{" "}
 											</div>
-											<p className="w-2/3 my-4">
-												Total Issues: {item.totalIssues ?? 0}
-											</p>
-											<p className="w-2/3">
-												Total Members: {item.totalIssues ?? 0}
-											</p>
+											<p className="w-2/3 my-4">Total Issues: 0</p>
+											<p className="w-2/3">Total Members: 0</p>
 										</div>
 									</div>
 								</Link>

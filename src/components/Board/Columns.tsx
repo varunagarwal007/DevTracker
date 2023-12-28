@@ -45,7 +45,7 @@ const Columns = ({
 				transform: CSS.Translate.toString(transform),
 			}}
 			className={clsx(
-				"w-full h-full p-4 bg-secondary rounded-lg flex flex-col gap-y-4 group",
+				"w-full h-full p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg flex flex-col gap-y-4 group",
 				isDragging && "opacity-50"
 			)}
 		>

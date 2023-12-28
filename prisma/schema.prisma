@@ -10,33 +10,63 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id             String    @id @unique
+  email          String?   @unique
+  name           String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  role           user_role @default(user)
+  avatar         String?
+  assignedIssues Issues[]  @relation("AssignedUser")
+  createdIssues  Issues[]  @relation("CreatedUser")
+  Project        Project?  @relation("UserAdminOfProject")
+  projects       Project[] @relation("ProjectMember")
+}
+
+model Project {
+  id          String   @id @unique @default(uuid())
+  title       String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  projectType project_type
+  admin       User         @relation("UserAdminOfProject", fields: [adminId], references: [id])
+  adminId     String       @unique
+  teamMembers User[]       @relation("ProjectMember")
+  issues      Issues[]
+}
+
+model Issues {
+  id                String        @id @unique @default(uuid())
+  title             String
+  description       String
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  project           Project       @relation(fields: [projectId], references: [id])
+  projectId         String
+  assignedTo        User?         @relation("AssignedUser", fields: [assignedToId], references: [id])
+  assignedToId      String?
+  createdBy         User          @relation("CreatedUser", fields: [createdById], references: [id])
+  createdById       String
+  type              issue_type
+  status            issue_status
+  labels            issue_labels?
+  priority          Int?
+  story_points      Int?
+  original_estimate Int?
+  time_completed    Int?
+  due_date          DateTime
+}
+
 enum user_role {
   user
   admin
 }
 
-model User {
-  id      String    @id @unique @default(cuid())
-  email   String?
-  Project Project[]
-  Issues  Issues[]
-  role    user_role @default(user)
-  avatar  String?
-}
-
 enum project_type {
   software
-}
-
-model Project {
-  id          String       @id @unique @default(cuid())
-  title       String?
-  admin       User?        @relation(fields: [userId], references: [id])
-  totalIssues Int?
-  all_issues  Issues[]
-  userId      String?
-  projectType project_type @default(software)
-  picture     String?
 }
 
 enum issue_type {
@@ -59,18 +89,4 @@ enum issue_labels {
   DevOps
   FrontEnd
   Backend
-}
-
-model Issues {
-  id         String    @id @unique @default(cuid())
-  project_id Project   @relation(fields: [projectId], references: [id])
-  created_at DateTime? @default(now())
-  created_by User?     @relation(fields: [userId], references: [id])
-  updated_at DateTime? @updatedAt
-
-  projectId String
-  userId    String?
-  type      issue_type    @default(BUG)
-  status    issue_status  @default(NEW)
-  labels    issue_labels?
 }

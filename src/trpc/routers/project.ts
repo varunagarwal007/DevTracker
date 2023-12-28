@@ -14,7 +14,7 @@ export const projectRouters = router({
 
 		const userProjects = await db.project.findMany({
 			where: {
-				userId: user.id,
+				OR: [{ adminId: user.id }, { teamMembers: { some: { id: user.id } } }],
 			},
 		})
 		return userProjects
@@ -30,21 +30,21 @@ export const projectRouters = router({
 			const res = await db.project.create({
 				data: {
 					title: input.title,
-					userId: ctx.userId,
+					adminId: ctx.userId,
+					projectType: "software",
 				},
 			})
 			return res
 		}),
-	getProjectDetail: privateProcedure
+	getProjectById: privateProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
-			const res = await db.project.findFirst({
+			const data = await db.project.findFirst({
 				where: {
 					id: input.id,
 				},
 			})
-			if (!res)
-				throw new TRPCError({ code: "NOT_FOUND", message: "Project Not found" })
-			return res
+			if (!data) throw new TRPCError({ code: "NOT_FOUND" })
+			return data
 		}),
 })
