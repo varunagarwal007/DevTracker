@@ -96,17 +96,24 @@ export const issueRouters = router({
 			return res
 		}),
 
-	issuesSubscription: publicProcedure.subscription(({ ctx }) => {
-		return observable<Issues>((emit) => {
-			const onIssuesUpdate = (data: Issues) => {
-				emit.next(data)
-			}
+	getIssuesList: privateProcedure
+		.input(z.object({ project_id: z.string() }))
+		.query(async ({ ctx, input }) => {
+			const res = await db.issues.findMany({
+				where: { projectId: input.project_id },
+				select: {
+					title: true,
+					description: true,
+					due_date: true,
+					id: true,
+					priority: true,
+					type: true,
+					status: true,
+					assignedTo: true,
+				},
+			})
 
-			emitter.on("getIssues", onIssuesUpdate)
-
-			return () => {
-				emitter.off("getIssues", onIssuesUpdate)
-			}
-		})
-	}),
+			if (!res) throw new TRPCError({ code: "NOT_FOUND" })
+			return res
+		}),
 })

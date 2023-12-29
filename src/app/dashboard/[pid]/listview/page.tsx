@@ -5,7 +5,7 @@ interface PageParams {
 	}
 }
 const Page = async ({ params }: PageParams) => {
-	return <ListView />
+	return <ListView projectId={params.pid} />
 }
 
 export default Page
