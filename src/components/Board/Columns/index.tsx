@@ -44,6 +44,7 @@ const Columns = ({ columnDetails }: ColumnProps) => {
 		id: columnDetails.key,
 		data: {
 			type: "column",
+			columnDetails,
 		},
 	})
 	return (

@@ -56,6 +56,7 @@ const IssueCard = ({ cardDetails }: CardProps) => {
 		data: {
 			type: "card",
 			title: cardDetails.title,
+			parent: cardDetails.status.toLowerCase(),
 		},
 	})
 	const IssyeTypeIcon =

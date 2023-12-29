@@ -27,7 +27,6 @@ import {
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import { notFound, usePathname } from "next/navigation"
-import { useState } from "react"
 interface PageParams {
 	pid: string
 }
@@ -54,8 +53,6 @@ export default function DashboardLayout({
 		}
 	)
 
-	const [isPlanningOpen, setIsPlanningOpen] = useState<boolean>(false)
-	const [isDevOpen, setIsDevOpen] = useState<boolean>(false)
 	const { setTheme, theme } = useTheme()
 
 	if (isError) notFound()
@@ -99,13 +96,11 @@ export default function DashboardLayout({
 						<div className="my-4">
 							<Collapsible
 								className="space-y-2 w-full"
-								open={
-									(pathName.includes("timeline") ||
-										pathName.includes("board")) &&
-									isPlanningOpen
+								defaultOpen={
+									pathName.includes("board") ||
+									pathName.includes("listview") ||
+									pathName.includes("playground")
 								}
-								defaultOpen={true}
-								onOpenChange={() => setIsPlanningOpen((f) => !f)}
 							>
 								<div className="flex items-center justify-between space-x-4 px-4 w-full group cursor-pointer ">
 									<h4 className="text-sm font-semibold text-muted-foreground group-hover:text-primary">
@@ -137,39 +132,34 @@ export default function DashboardLayout({
 										<span className="font-medium text-xs ">Board</span>
 									</Link>
 									<Link
-										href={"#"}
+										href={`/dashboard/${projectId}/listview`}
 										className={cn(
 											"rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100",
 											{
 												"border border-sm border-primary-foreground text-primary bg-red-100":
-													pathName === `/dashboard/${projectId}/timeline`,
+													pathName === `/dashboard/${projectId}/listview`,
 											}
 										)}
 									>
 										<GanttChart className="h-5 w-5 mx-2 " />
-										<span className="font-medium text-xs ">Timeline</span>
+										<span className="font-medium text-xs ">List View</span>
 									</Link>
 									<Link
-										href={`/dashboard/${projectId}/addview`}
+										href={`/dashboard/${projectId}/playground`}
 										className={cn(
 											"rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100",
 											{
 												"border border-sm border-primary-foreground text-primary bg-red-100":
-													pathName === `/dashboard/board/${projectId}/addview`,
+													pathName.includes("playground"),
 											}
 										)}
 									>
 										<PlusSquare className="h-5 w-5 mx-2 " />
-										<span className="font-medium text-xs ">Add view</span>
+										<span className="font-medium text-xs ">Playground</span>
 									</Link>
 								</CollapsibleContent>
 							</Collapsible>
-							<Collapsible
-								className="w-full space-y-2"
-								open={pathName.includes("code") || isDevOpen}
-								defaultOpen={true}
-								onOpenChange={() => setIsDevOpen((f) => !f)}
-							>
+							<Collapsible className="w-full space-y-2">
 								<div className="flex items-center justify-between space-x-4 px-4 w-full group cursor-pointer">
 									<h4 className="text-sm font-semibold text-muted-foreground group-hover:text-primary">
 										DEVELOPMENT

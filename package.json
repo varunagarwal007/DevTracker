@@ -26,6 +26,7 @@
     "@radix-ui/react-switch": "^1.0.3",
     "@radix-ui/react-toast": "^1.1.5",
     "@tanstack/react-query": "^4.35.3",
+    "@tldraw/tldraw": "^2.0.0-beta.1",
     "@trpc/client": "^10.43.1",
     "@trpc/next": "^10.43.1",
     "@trpc/react-query": "^10.43.1",

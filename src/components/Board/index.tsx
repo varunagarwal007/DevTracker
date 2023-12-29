@@ -6,14 +6,23 @@ import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog"
 import { Input } from "../ui/input"
 import KanBanTable from "./Table"
 import CreateNewIssueForm from "./Task/NewTaskForm"
+import { Loader2 } from "lucide-react"
 
 const Board = ({ projectId }: { projectId: string }) => {
 	const { data, isLoading, isError, refetch } =
-		trpc.issue.getIssuesByProject.useQuery({
-			project_id: projectId,
-		})
+		trpc.issue.getIssuesByProject.useQuery(
+			{
+				project_id: projectId,
+			},
+			{ staleTime: 5 * 1000 }
+		)
 
-	if (isLoading) return <h1>LOading...</h1>
+	if (isLoading)
+		return (
+			<div className="w-full h-full grid place-items-center text-4xl">
+				<Loader2 className="w-10 h-10 space-x-2 animate-spin" /> Loading...
+			</div>
+		)
 	if (!data) return notFound()
 	console.log(data)
 
@@ -42,7 +51,7 @@ const Board = ({ projectId }: { projectId: string }) => {
 			</div>
 			{/* Kanban Table */}
 			{/* @ts-ignore */}
-			<KanBanTable tableData={data} />
+			<KanBanTable tableData={data} refetch={refetch} />
 		</div>
 	)
 }

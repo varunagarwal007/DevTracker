@@ -3,6 +3,7 @@ import {
 	DndContext,
 	DragEndEvent,
 	DragMoveEvent,
+	DragOverlay,
 	DragStartEvent,
 	KeyboardSensor,
 	PointerSensor,
@@ -18,8 +19,9 @@ import {
 } from "@dnd-kit/sortable"
 import { $Enums } from "@prisma/client"
 import Columns from "../Columns/index"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { trpc } from "@/app/_trpc/client"
+import IssueCard from "../IssueCard"
 
 interface KanbanTableProps {
 	tableData: {
@@ -45,14 +47,19 @@ interface KanbanTableProps {
 			} | null
 		}[]
 	}[]
+	refetch: () => void
 }
 
-const KanBanTable = ({ tableData }: KanbanTableProps) => {
+const KanBanTable = ({ tableData, refetch }: KanbanTableProps) => {
 	const [initialData, changeInitialData] = useState(tableData)
-	const [selectedCardId, setSelectedCardId] = useState<UniqueIdentifier>("")
+	const [selectedCardId, setSelectedCardId] = useState("")
 
-	const { mutate: updateIssueStatus } =
-		trpc.issue.updateIssueStatus.useMutation()
+	const { mutate: changeIssueStatus } =
+		trpc.issue.updateIssueStatus.useMutation({
+			onSuccess: () => {
+				refetch()
+			},
+		})
 	const sensors = useSensors(
 		useSensor(PointerSensor),
 		useSensor(KeyboardSensor, {
@@ -62,22 +69,145 @@ const KanBanTable = ({ tableData }: KanbanTableProps) => {
 	function handleDragStart(event: DragStartEvent) {
 		const { active } = event
 		const { id } = active
-		setSelectedCardId(id)
+		setSelectedCardId(id.toString())
 	}
-	function handleDragMove(event: DragMoveEvent) {
+	const handleDragMove = (event: DragMoveEvent) => {
+		const { active, over } = event
+		let columnIds = ["new", "active", "resolved", "closed"]
 		// console.log(event)
+
+		// Handle Items Sorting
+		if (over && active && active.id && over?.id && active.id !== over.id) {
+			// Find the active container and over container
+			const activeContainer = initialData.find((columns) =>
+				columns.items.find((item) => item.id === active.id)
+			)
+			const overContainer = initialData.find((columns) =>
+				columns.items.find((item) => item.id === over.id)
+			)
+
+			// If the active or over container is not found, return
+			if (!activeContainer || !overContainer) return
+
+			// Find the index of the active and over container
+			const activeContainerIndex = initialData.findIndex(
+				(container) => container.key === activeContainer.key
+			)
+			const overContainerIndex = initialData.findIndex(
+				(container) => container.key === overContainer.key
+			)
+
+			// Find the index of the active and over item
+			const activeitemIndex = activeContainer.items?.findIndex(
+				(item) => item.id === active.id
+			)
+			const overitemIndex = overContainer.items?.findIndex(
+				(item) => item.id === over.id
+			)
+			// In the same container
+			if (activeContainerIndex === overContainerIndex) {
+				// let newItems = [...initialData]
+				// newItems[activeContainerIndex].items = arrayMove(
+				// 	newItems[activeContainerIndex].items,
+				// 	activeitemIndex,
+				// 	overitemIndex
+				// )
+				console.log("Line: 109")
+				// changeInitialData(newItems)
+			} else {
+				// In different containers
+				let newItems = [...initialData]
+				const [removeditem] = newItems[activeContainerIndex].items.splice(
+					activeitemIndex,
+					1
+				)
+				console.log(removeditem)
+				let temp_issue_status = newItems[overContainerIndex].key.toUpperCase()
+
+				changeIssueStatus({
+					issue_id: removeditem.id,
+					issue_status:
+						temp_issue_status === "NEW"
+							? $Enums.issue_status.NEW
+							: temp_issue_status === "ACTIVE"
+							? $Enums.issue_status.ACTIVE
+							: temp_issue_status === "RESOLVED"
+							? $Enums.issue_status.RESOLVED
+							: $Enums.issue_status.CLOSED,
+				})
+				newItems[overContainerIndex].items.splice(overitemIndex, 0, removeditem)
+				console.log("Line: 119")
+				// changeInitialData(newItems)
+			}
+		}
+
+		// Handling Item Drop Into a Container
+		if (
+			active &&
+			over &&
+			active.id.toString() &&
+			columnIds.includes(over?.id.toString()) &&
+			active.id !== over.id
+		) {
+			// Find the active and over container
+			const activeContainer = initialData.find((columns) =>
+				columns.items.find((item) => item.id === active.id)
+			)
+			const overContainer = initialData.find(
+				(columns) => columns.key === over.id
+			)
+
+			// If the active or over container is not found, return
+			if (!activeContainer || !overContainer) return
+			let overIdString = over.id.toString().toUpperCase()
+			changeIssueStatus({
+				issue_id: active.id.toString(),
+				issue_status:
+					overIdString === "NEW"
+						? $Enums.issue_status.NEW
+						: overIdString === "ACTIVE"
+						? $Enums.issue_status.ACTIVE
+						: overIdString === "RESOLVED"
+						? $Enums.issue_status.RESOLVED
+						: $Enums.issue_status.CLOSED,
+			})
+
+			// Find the index of the active and over container
+			const activeContainerIndex = initialData.findIndex(
+				(container) => container.key === activeContainer.key
+			)
+			const overContainerIndex = initialData.findIndex(
+				(container) => container.key === overContainer.key
+			)
+
+			// Find the index of the active and over item
+			const activeitemIndex = activeContainer.items?.findIndex(
+				(item) => item.id === active.id
+			)
+
+			// Remove the active item from the active container and add it to the over container
+			let newItems = [...initialData]
+			const [removeditem] = newItems[activeContainerIndex].items.splice(
+				activeitemIndex,
+				1
+			)
+			newItems[overContainerIndex].items?.push(removeditem)
+			changeInitialData(newItems)
+			console.log("Line: 175")
+		}
 	}
-	/*
+
 	function handleDragEnd(event: DragEndEvent) {
 		const { active, over } = event
 		console.log(event)
+		let columnIds = ["new", "active", "resolved", "closed"]
 
 		// Handling Container Sorting
 		if (
-			active.id.toString().includes("container") &&
-			over?.id.toString().includes("container") &&
-			active &&
 			over &&
+			active &&
+			columnIds.includes(active.id.toString()) &&
+			columnIds.includes(over?.id.toString()) &&
 			active.id !== over.id
 		) {
 			// Find the index of the active and over container
@@ -91,29 +221,83 @@ const KanBanTable = ({ tableData }: KanbanTableProps) => {
 			let newItems = [...initialData]
 			newItems = arrayMove(newItems, activeContainerIndex, overContainerIndex)
 			changeInitialData(newItems)
+			console.log("Line: 204")
 		}
 
-		// Handling item Sorting
+		// Handling item dropping into Container
 		if (
-			active.id.toString().includes("item") &&
-			over?.id.toString().includes("item") &&
 			active &&
 			over &&
+			active.id.toString() &&
+			columnIds.includes(over?.id.toString()) &&
 			active.id !== over.id
 		) {
 			// Find the active and over container
-			const activeContainer = findValueOfItems(active.id, "item")
-			const overContainer = findValueOfItems(over.id, "item")
+			const activeContainer = initialData.find((columns) =>
+				columns.items.find((item) => item.id === active.id)
+			)
+			const overContainer = initialData.find(
+				(columns) => columns.key === over.id
+			)
+
+			// If the active or over container is not found, return
+			if (!activeContainer || !overContainer) return
+			// Find the index of the active and over container
+			let overIdString = over.id.toString().toUpperCase()
+			console.log("Here")
+			changeIssueStatus({
+				issue_id: active.id.toString(),
+				issue_status:
+					overIdString === "NEW"
+						? $Enums.issue_status.NEW
+						: overIdString === "ACTIVE"
+						? $Enums.issue_status.ACTIVE
+						: overIdString === "RESOLVED"
+						? $Enums.issue_status.RESOLVED
+						: $Enums.issue_status.CLOSED,
+			})
+			const activeContainerIndex = initialData.findIndex(
+				(container) => container.key === activeContainer.key
+			)
+			const overContainerIndex = initialData.findIndex(
+				(container) => container.key === overContainer.key
+			)
+			// Find the index of the active and over item
+			const activeitemIndex = activeContainer.items.findIndex(
+				(item) => item.id === active.id
+			)
+
+			let newItems = [...initialData]
+			const [removeditem] = newItems[activeContainerIndex].items.splice(
+				activeitemIndex,
+				1
+			)
+			newItems[overContainerIndex].items.push(removeditem)
+			changeInitialData(newItems)
+			console.log("Line: 258")
+		}
+
+		// Handling item Sorting
+		console.log("Here")
+		if (active && over && active.id && over?.id && active.id !== over.id) {
+			// Find the active and over container
+			const activeContainer = initialData.find((columns) =>
+				columns.items.find((item) => item.id === active.id)
+			)
+			const overContainer = initialData.find((columns) =>
+				columns.items.find((item) => item.id === over.id)
+			)
 
 			// If the active or over container is not found, return
 			if (!activeContainer || !overContainer) return
 			// Find the index of the active and over container
 			const activeContainerIndex = initialData.findIndex(
-				(container) => container.id === activeContainer.id
+				(container) => container.key === activeContainer.key
 			)
 			const overContainerIndex = initialData.findIndex(
-				(container) => container.id === overContainer.id
+				(container) => container.key === overContainer.key
 			)
+			console.log("Here")
 			// Find the index of the active and over item
 			const activeitemIndex = activeContainer.items.findIndex(
 				(item) => item.id === active.id
@@ -130,6 +314,7 @@ const KanBanTable = ({ tableData }: KanbanTableProps) => {
 					activeitemIndex,
 					overitemIndex
 				)
+				console.log("Line: 298")
 				changeInitialData(newItems)
 			} else {
 				// In different containers
@@ -138,47 +323,18 @@ const KanBanTable = ({ tableData }: KanbanTableProps) => {
 					activeitemIndex,
 					1
 				)
+				console.log(removeditem)
 				newItems[overContainerIndex].items.splice(overitemIndex, 0, removeditem)
 				changeInitialData(newItems)
+				console.log("Line: 309")
 			}
 		}
-
-		// Handling item dropping into Container
-		if (
-			active.id.toString().includes("item") &&
-			over?.id.toString().includes("container") &&
-			active &&
-			over &&
-			active.id !== over.id
-		) {
-			// Find the active and over container
-			const activeContainer = findValueOfItems(active.id, "item")
-			const overContainer = findValueOfItems(over.id, "container")
-
-			// If the active or over container is not found, return
-			if (!activeContainer || !overContainer) return
-			// Find the index of the active and over container
-			const activeContainerIndex = containers.findIndex(
-				(container) => container.id === activeContainer.id
-			)
-			const overContainerIndex = containers.findIndex(
-				(container) => container.id === overContainer.id
-			)
-			// Find the index of the active and over item
-			const activeitemIndex = activeContainer.items.findIndex(
-				(item) => item.id === active.id
-			)
-
-			let newItems = [...containers]
-			const [removeditem] = newItems[activeContainerIndex].items.splice(
-				activeitemIndex,
-				1
-			)
-			newItems[overContainerIndex].items.push(removeditem)
-			setContainers(newItems)
-		}
 	}
-	*/
+
+	useEffect(() => {
+		changeInitialData(tableData)
+	}, [tableData])
+
 	return (
 		<div className="grid grid-cols-4 gap-2 md:gap-4">
 			<DndContext
@@ -186,13 +342,38 @@ const KanBanTable = ({ tableData }: KanbanTableProps) => {
 				collisionDetection={closestCorners}
 				onDragStart={handleDragStart}
 				onDragMove={handleDragMove}
-				// onDragEnd={handleDragEnd}
+				onDragEnd={handleDragEnd}
 			>
 				<SortableContext items={["new", "active", "resolved", "closed"]}>
 					{initialData.map((column, index) => (
 						<Columns columnDetails={column} key={index} />
 					))}
 				</SortableContext>
+				<DragOverlay adjustScale={false}>
+					{/* Drag Overlay For Container */}
+					{selectedCardId &&
+						["new", "active", "closed", "resolved"].includes(
+							selectedCardId
+						) && (
+							<Columns
+								columnDetails={
+									initialData.filter((i) => i.key === selectedCardId)[0]
+								}
+								key={selectedCardId}
+							/>
+						)}
+					{/* Drag Overlay For item Item */}
+					{selectedCardId && (
+						<IssueCard
+							//@ts-ignore
+							cardDetails={
+								initialData.find(
+									(c) => c.items?.find((i) => i.id === selectedCardId)
+								)?.items[0]
+							}
+						/>
+					)}
+				</DragOverlay>
 			</DndContext>
 		</div>
 	)

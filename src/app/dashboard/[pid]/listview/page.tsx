@@ -1,11 +1,11 @@
-import TimeLine from "@/components/Timeline"
+import ListView from "@/components/ListView"
 interface PageParams {
 	params: {
 		pid: string
 	}
 }
 const Page = async ({ params }: PageParams) => {
-	return <TimeLine />
+	return <ListView />
 }
 
 export default Page
