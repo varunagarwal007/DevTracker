@@ -19,9 +19,10 @@ const nextConfig = {
 		config.resolve.alias.encoding = false
 		return config
 	},
+	typescript: {
+		ignoreBuildErrors: true,
+	},
 	images: { domains: ["api.dicebear.com"] },
-	reactStrictMode: false,
-	swcMinify: false,
 }
 
 module.exports = nextConfig

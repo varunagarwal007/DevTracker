@@ -1,7 +1,12 @@
 import { Button } from "@/components/ui/button"
 import { SortableContext, useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { $Enums } from "@prisma/client"
+import {
+	issue_type,
+	issue_status,
+	issue_labels,
+	user_role,
+} from "@prisma/client"
 import clsx from "clsx"
 import { GripHorizontal, Plus } from "lucide-react"
 import React from "react"
@@ -15,11 +20,11 @@ interface ColumnProps {
 			id: string
 			title: string
 			description: string
-			type: $Enums.issue_type // Assuming an enum for issue types
-			status: $Enums.issue_status // Assuming an enum for issue statuses
+			type: issue_type // Assuming an enum for issue types
+			status: issue_status // Assuming an enum for issue statuses
 			due_date: string
 			priority: number | null
-			labels: $Enums.issue_labels
+			labels: issue_labels
 			task_number: number
 			assignedTo: {
 				id: string
@@ -27,7 +32,7 @@ interface ColumnProps {
 				name: string | null
 				createdAt: Date
 				updatedAt: Date
-				role: $Enums.user_role // Assuming an enum for user roles
+				role: user_role // Assuming an enum for user roles
 				avatar: string | null
 				projectId: string | null
 			} | null

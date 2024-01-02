@@ -10,7 +10,12 @@ import {
 } from "@/components/ui/card"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { $Enums } from "@prisma/client"
+import {
+	issue_type,
+	issue_status,
+	user_role,
+	issue_labels,
+} from "@prisma/client"
 import clsx from "clsx"
 import {
 	BookOpenText,
@@ -26,11 +31,11 @@ interface CardProps {
 		id: string
 		title: string
 		description: string
-		type: $Enums.issue_type // Assuming an enum for issue types
-		status: $Enums.issue_status // Assuming an enum for issue statuses
+		type: issue_type // Assuming an enum for issue types
+		status: issue_status // Assuming an enum for issue statuses
 		due_date: string
 		priority: number | null
-		labels: $Enums.issue_labels
+		labels: issue_labels
 		task_number: number
 		assignedTo: {
 			id: string
@@ -38,7 +43,7 @@ interface CardProps {
 			name: string | null
 			createdAt: Date
 			updatedAt: Date
-			role: $Enums.user_role // Assuming an enum for user roles
+			role: user_role // Assuming an enum for user roles
 			avatar: string | null
 			projectId: string | null
 		} | null
@@ -65,10 +70,10 @@ const IssueCard = ({ cardDetails }: CardProps) => {
 		cardDetails.type === "TASK"
 			? "CheckSquareIcon"
 			: cardDetails.type === "STORY"
-			? "BookOpenText"
-			: cardDetails.type === "SUBTASK"
-			? "ListChecksIcon"
-			: "Bug"
+				? "BookOpenText"
+				: cardDetails.type === "SUBTASK"
+					? "ListChecksIcon"
+					: "Bug"
 	return (
 		<div
 			ref={setNodeRef}

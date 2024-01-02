@@ -17,7 +17,12 @@ import {
 	arrayMove,
 	sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable"
-import { $Enums } from "@prisma/client"
+import {
+	issue_type,
+	issue_status,
+	user_role,
+	issue_labels,
+} from "@prisma/client"
 import Columns from "../Columns/index"
 import { useEffect, useState } from "react"
 import { trpc } from "@/app/_trpc/client"
@@ -31,19 +36,19 @@ interface KanbanTableProps {
 			id: string
 			title: string
 			description: string
-			type: $Enums.issue_type // Assuming an enum for issue types
-			status: $Enums.issue_status // Assuming an enum for issue statuses
+			type: issue_type // Assuming an enum for issue types
+			status: issue_status // Assuming an enum for issue statuses
 			due_date: string
 			priority: number | null
 			task_number: number
-			labels: $Enums.issue_labels
+			labels: issue_labels
 			assignedTo: {
 				id: string
 				email: string | null
 				name: string | null
 				createdAt: Date
 				updatedAt: Date
-				role: $Enums.user_role // Assuming an enum for user roles
+				role: user_role // Assuming an enum for user roles
 				avatar: string | null
 				projectId: string | null
 			} | null
@@ -129,12 +134,12 @@ const KanBanTable = ({ tableData, refetch, search }: KanbanTableProps) => {
 					issue_id: removeditem.id,
 					issue_status:
 						temp_issue_status === "NEW"
-							? $Enums.issue_status.NEW
+							? issue_status.NEW
 							: temp_issue_status === "ACTIVE"
-							? $Enums.issue_status.ACTIVE
-							: temp_issue_status === "RESOLVED"
-							? $Enums.issue_status.RESOLVED
-							: $Enums.issue_status.CLOSED,
+								? issue_status.ACTIVE
+								: temp_issue_status === "RESOLVED"
+									? issue_status.RESOLVED
+									: issue_status.CLOSED,
 				})
 				newItems[overContainerIndex].items.splice(overitemIndex, 0, removeditem)
 
@@ -165,12 +170,12 @@ const KanBanTable = ({ tableData, refetch, search }: KanbanTableProps) => {
 				issue_id: active.id.toString(),
 				issue_status:
 					overIdString === "NEW"
-						? $Enums.issue_status.NEW
+						? issue_status.NEW
 						: overIdString === "ACTIVE"
-						? $Enums.issue_status.ACTIVE
-						: overIdString === "RESOLVED"
-						? $Enums.issue_status.RESOLVED
-						: $Enums.issue_status.CLOSED,
+							? issue_status.ACTIVE
+							: overIdString === "RESOLVED"
+								? issue_status.RESOLVED
+								: issue_status.CLOSED,
 			})
 
 			// Find the index of the active and over container
@@ -248,12 +253,12 @@ const KanBanTable = ({ tableData, refetch, search }: KanbanTableProps) => {
 				issue_id: active.id.toString(),
 				issue_status:
 					overIdString === "NEW"
-						? $Enums.issue_status.NEW
+						? issue_status.NEW
 						: overIdString === "ACTIVE"
-						? $Enums.issue_status.ACTIVE
-						: overIdString === "RESOLVED"
-						? $Enums.issue_status.RESOLVED
-						: $Enums.issue_status.CLOSED,
+							? issue_status.ACTIVE
+							: overIdString === "RESOLVED"
+								? issue_status.RESOLVED
+								: issue_status.CLOSED,
 			})
 			const activeContainerIndex = initialData.findIndex(
 				(container) => container.key === activeContainer.key
