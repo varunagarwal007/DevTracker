@@ -38,8 +38,11 @@ const Overview = ({ projectId }: { projectId: string }) => {
 						<div className="text-primary text-lg">
 							Top Priority Issues of this Project.
 						</div>
-						{projectStats.topIssues.map((i) => (
-							<div className="w-full  h-16 bg-muted rounded-md p-2 flex flex-row items-center">
+						{projectStats.topIssues.map((i, index) => (
+							<div
+								className="w-full  h-16 bg-muted rounded-md p-2 flex flex-row items-center"
+								key={index}
+							>
 								<div className="flex flex-col">
 									<span>TASK-{i.task_number}</span>{" "}
 									<div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none border-primary focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground h-fit">

@@ -37,6 +37,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "date-fns": "^3.0.0",
+    "devtracker": "link:",
     "i": "^0.3.7",
     "lucide-react": "^0.291.0",
     "next": "14.0.1",

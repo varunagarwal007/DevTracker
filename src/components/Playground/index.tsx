@@ -1,6 +1,6 @@
 "use client"
 import { Tldraw } from "@tldraw/tldraw"
-import "@tldraw/tldraw/tldraw.css"
+import "@tldraw/tldraw/ui.css"
 
 const PlayGround = () => {
 	return (
@@ -11,7 +11,7 @@ const PlayGround = () => {
 				gap: 64,
 			}}
 		>
-			<Tldraw className="-z-10" />
+			<Tldraw />
 		</div>
 	)
 }
