@@ -66,7 +66,12 @@ export default function DashboardLayout({
 						<div className="my-4 flex items-center">
 							<div className="w-1/4 ml-3">
 								<Avatar className="w-9 h-9 aspect-square">
-									<AvatarImage src="https://api.dicebear.com/7.x/notionists/svg?randomizeIds=true" />
+									<AvatarImage
+										src={
+											data.picture ||
+											"https://api.dicebear.com/7.x/shapes/svg?seed=Chester"
+										}
+									/>
 									<AvatarFallback>User</AvatarFallback>
 								</Avatar>
 							</div>
@@ -119,6 +124,19 @@ export default function DashboardLayout({
 
 								<CollapsibleContent className="space-y-2">
 									<Link
+										href={`/dashboard/${projectId}/listview`}
+										className={cn(
+											"rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100",
+											{
+												"border border-sm border-primary-foreground text-primary bg-red-100":
+													pathName === `/dashboard/${projectId}/listview`,
+											}
+										)}
+									>
+										<GanttChart className="h-5 w-5 mx-2 " />
+										<span className="font-medium text-xs ">Task View</span>
+									</Link>
+									<Link
 										href={`/dashboard/${projectId}/board`}
 										className={cn(
 											"rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100",
@@ -131,19 +149,7 @@ export default function DashboardLayout({
 										<Clipboard className="h-5 w-5 mx-2 " />
 										<span className="font-medium text-xs ">Board</span>
 									</Link>
-									<Link
-										href={`/dashboard/${projectId}/listview`}
-										className={cn(
-											"rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100",
-											{
-												"border border-sm border-primary-foreground text-primary bg-red-100":
-													pathName === `/dashboard/${projectId}/listview`,
-											}
-										)}
-									>
-										<GanttChart className="h-5 w-5 mx-2 " />
-										<span className="font-medium text-xs ">List View</span>
-									</Link>
+
 									<Link
 										href={`/dashboard/${projectId}/playground`}
 										className={cn(
@@ -159,7 +165,7 @@ export default function DashboardLayout({
 									</Link>
 								</CollapsibleContent>
 							</Collapsible>
-							<Collapsible className="w-full space-y-2">
+							<Collapsible className="w-full space-y-2" defaultOpen={true}>
 								<div className="flex items-center justify-between space-x-4 px-4 w-full group cursor-pointer">
 									<h4 className="text-sm font-semibold text-muted-foreground group-hover:text-primary">
 										DEVELOPMENT
@@ -176,27 +182,64 @@ export default function DashboardLayout({
 								</div>
 
 								<CollapsibleContent className="space-y-2">
-									<div className="rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100">
+									<Link
+										href={`/dashboard/${projectId}/code`}
+										className={cn(
+											"rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100",
+											{
+												"border border-sm border-primary-foreground text-primary bg-red-100":
+													pathName === `/dashboard/${projectId}/code`,
+											}
+										)}
+									>
 										<Code2 className="h-5 w-5 mx-2 " />
-										<span className="font-medium text-xs text-initi">Code</span>
-									</div>
+										<span className="font-medium text-xs ">code</span>
+									</Link>
 								</CollapsibleContent>
 							</Collapsible>
 						</div>
 						<Separator />
 						<div className="my-4 space-y-2">
-							<div className="rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100">
+							<Link
+								href={`/dashboard/${projectId}/document`}
+								className={cn(
+									"rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100",
+									{
+										"border border-sm border-primary-foreground text-primary bg-red-100":
+											pathName === `/dashboard/${projectId}/document`,
+									}
+								)}
+							>
 								<Newspaper className="h-5 w-5 mx-2 " />
-								<span className="font-medium text-xs">Document</span>
-							</div>
-							<div className="rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100">
+								<span className="font-medium text-xs ">Document</span>
+							</Link>
+
+							<Link
+								href={`/dashboard/${projectId}/calendar`}
+								className={cn(
+									"rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100",
+									{
+										"border border-sm border-primary-foreground text-primary bg-red-100":
+											pathName === `/dashboard/${projectId}/calendar`,
+									}
+								)}
+							>
 								<Calendar className="h-5 w-5 mx-2 " />
-								<span className="font-medium text-xs">Calender</span>
-							</div>
-							<div className="rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100">
+								<span className="font-medium text-xs ">Calendar</span>
+							</Link>
+							<Link
+								href={`/dashboard/${projectId}/settings`}
+								className={cn(
+									"rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100",
+									{
+										"border border-sm border-primary-foreground text-primary bg-red-100":
+											pathName === `/dashboard/${projectId}/settings`,
+									}
+								)}
+							>
 								<Settings className="h-5 w-5 mx-2 " />
 								<span className="font-medium text-xs ">Settings</span>
-							</div>
+							</Link>
 							<div
 								className="rounded-md px-4 py-3 flex items-center space-x-2 w-full text-muted-foreground cursor-pointer hover:text-primary hover:bg-red-100"
 								onClick={() => {

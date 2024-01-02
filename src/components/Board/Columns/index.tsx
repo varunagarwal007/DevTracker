@@ -19,6 +19,8 @@ interface ColumnProps {
 			status: $Enums.issue_status // Assuming an enum for issue statuses
 			due_date: string
 			priority: number | null
+			labels: $Enums.issue_labels
+			task_number: number
 			assignedTo: {
 				id: string
 				email: string | null

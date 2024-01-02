@@ -20,6 +20,15 @@ export const issueRouters = router({
 				original_estimate: z.number(),
 				due_date: z.coerce.date(),
 				priority: z.number(),
+				label: z.enum([
+					"Design",
+					"Development",
+					"DevOps",
+					"Frontend",
+					"Backend",
+					"Documentation",
+					"Feature",
+				]),
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -59,6 +68,8 @@ export const issueRouters = router({
 					type: true,
 					status: true,
 					assignedTo: true,
+					labels: true,
+					task_number: true,
 				},
 			})
 			const issueStatus = ["NEW", "ACTIVE", "RESOLVED", "CLOSED"]
@@ -110,6 +121,8 @@ export const issueRouters = router({
 					type: true,
 					status: true,
 					assignedTo: true,
+					labels: true,
+					task_number: true,
 				},
 			})
 

@@ -30,6 +30,8 @@ interface CardProps {
 		status: $Enums.issue_status // Assuming an enum for issue statuses
 		due_date: string
 		priority: number | null
+		labels: $Enums.issue_labels
+		task_number: number
 		assignedTo: {
 			id: string
 			email: string | null
@@ -94,30 +96,33 @@ const IssueCard = ({ cardDetails }: CardProps) => {
 					<Badge className="bg-red-500 text-white text-sm">High Priority</Badge>
 					<p className="mt-4 line-clamp-4">{cardDetails.description}</p>
 				</CardContent> */}
-				<CardFooter>
+				<CardFooter className="w-full flex justify-between">
 					<div className="flex items-center space-x-2 rounded-md bg-secondary p-1 text-xs">
 						{cardDetails.type === "TASK" ? (
 							<>
 								<CheckSquareIcon className="w-4 h-4 text-primary" />
-								<span>TASK-56</span>
+								<span>TASK-{cardDetails.task_number}</span>
 							</>
 						) : cardDetails.type === "STORY" ? (
 							<>
 								<BookOpenText className="w-4 h-4 text-primary" />
-								<span>TASK-4</span>
+								<span>TASK-{cardDetails.task_number}</span>
 							</>
 						) : cardDetails.type === "SUBTASK" ? (
 							<>
 								<ListChecksIcon className="w-4 h-4 text-primary" />
-								<span>TASK-898</span>
+								<span>TASK-{cardDetails.task_number}</span>
 							</>
 						) : (
 							<>
 								<Bug className="w-4 h-4 text-primary" />
-								<span>TASK-1</span>
+								<span>TASK-{cardDetails.task_number}</span>
 							</>
 						)}
 					</div>
+					<div className="inline-flex items-center rounded-md border border-primary px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground">
+						{cardDetails.labels ?? "Bug"}
+					</div>{" "}
 				</CardFooter>
 			</Card>
 		</div>

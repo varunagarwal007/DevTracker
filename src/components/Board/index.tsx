@@ -1,14 +1,16 @@
 "use client"
 import { trpc } from "@/app/_trpc/client"
-import { notFound, usePathname } from "next/navigation"
+import { Loader2 } from "lucide-react"
+import { notFound } from "next/navigation"
+import { useState } from "react"
 import { Button } from "../ui/button"
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog"
 import { Input } from "../ui/input"
 import KanBanTable from "./Table"
 import CreateNewIssueForm from "./Task/NewTaskForm"
-import { Loader2 } from "lucide-react"
 
 const Board = ({ projectId }: { projectId: string }) => {
+	const [search, setSearch] = useState<string>("")
 	const { data, isLoading, isError, refetch } =
 		trpc.issue.getIssuesByProject.useQuery(
 			{
@@ -17,14 +19,14 @@ const Board = ({ projectId }: { projectId: string }) => {
 			{ staleTime: 5 * 1000 }
 		)
 
-	if (isLoading)
+	if (isLoading) {
 		return (
-			<div className="w-full h-full grid place-items-center text-4xl">
+			<div className="w-full h-full flex place-items-center text-4xl">
 				<Loader2 className="w-10 h-10 space-x-2 animate-spin" /> Loading...
 			</div>
 		)
+	}
 	if (!data) return notFound()
-	console.log(data)
 
 	return (
 		<div className="w-full h-full">
@@ -35,7 +37,11 @@ const Board = ({ projectId }: { projectId: string }) => {
 				</p>
 			</div>
 			<div className="h-20 w-full flex">
-				<Input placeholder="Search for issues" className="" />
+				<Input
+					placeholder="Search for issues"
+					className=""
+					onChange={(e) => setSearch(e.target.value)}
+				/>
 				<Button variant={"link"}>Only My Issues</Button>
 				<Button variant={"link"} disabled>
 					Clear all filters
@@ -51,7 +57,7 @@ const Board = ({ projectId }: { projectId: string }) => {
 			</div>
 			{/* Kanban Table */}
 			{/* @ts-ignore */}
-			<KanBanTable tableData={data} refetch={refetch} />
+			<KanBanTable tableData={data} refetch={refetch} search={search} />
 		</div>
 	)
 }

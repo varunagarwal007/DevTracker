@@ -1,11 +1,12 @@
-import Overview from "@/components/Overview"
+import Settings from "@/components/Settings"
+
 interface PageParams {
 	params: {
 		pid: string
 	}
 }
 const Page = async ({ params }: PageParams) => {
-	return <Overview projectId={params.pid} />
+	return <Settings projectId={params.pid} />
 }
 
 export default Page

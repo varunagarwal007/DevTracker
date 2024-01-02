@@ -35,6 +35,8 @@ interface KanbanTableProps {
 			status: $Enums.issue_status // Assuming an enum for issue statuses
 			due_date: string
 			priority: number | null
+			task_number: number
+			labels: $Enums.issue_labels
 			assignedTo: {
 				id: string
 				email: string | null
@@ -48,9 +50,10 @@ interface KanbanTableProps {
 		}[]
 	}[]
 	refetch: () => void
+	search?: string
 }
 
-const KanBanTable = ({ tableData, refetch }: KanbanTableProps) => {
+const KanBanTable = ({ tableData, refetch, search }: KanbanTableProps) => {
 	const [initialData, changeInitialData] = useState(tableData)
 	const [selectedCardId, setSelectedCardId] = useState("")
 
@@ -74,7 +77,6 @@ const KanBanTable = ({ tableData, refetch }: KanbanTableProps) => {
 	const handleDragMove = (event: DragMoveEvent) => {
 		const { active, over } = event
 		let columnIds = ["new", "active", "resolved", "closed"]
-		// console.log(event)
 
 		// Handle Items Sorting
 		if (over && active && active.id && over?.id && active.id !== over.id) {
@@ -112,7 +114,6 @@ const KanBanTable = ({ tableData, refetch }: KanbanTableProps) => {
 				// 	activeitemIndex,
 				// 	overitemIndex
 				// )
-				console.log("Line: 109")
 				// changeInitialData(newItems)
 			} else {
 				// In different containers
@@ -121,7 +122,7 @@ const KanBanTable = ({ tableData, refetch }: KanbanTableProps) => {
 					activeitemIndex,
 					1
 				)
-				console.log(removeditem)
+
 				let temp_issue_status = newItems[overContainerIndex].key.toUpperCase()
 
 				changeIssueStatus({
@@ -136,7 +137,7 @@ const KanBanTable = ({ tableData, refetch }: KanbanTableProps) => {
 							: $Enums.issue_status.CLOSED,
 				})
 				newItems[overContainerIndex].items.splice(overitemIndex, 0, removeditem)
-				console.log("Line: 119")
+
 				// changeInitialData(newItems)
 			}
 		}
@@ -193,13 +194,12 @@ const KanBanTable = ({ tableData, refetch }: KanbanTableProps) => {
 			)
 			newItems[overContainerIndex].items?.push(removeditem)
 			changeInitialData(newItems)
-			console.log("Line: 175")
 		}
 	}
 
 	function handleDragEnd(event: DragEndEvent) {
 		const { active, over } = event
-		console.log(event)
+
 		let columnIds = ["new", "active", "resolved", "closed"]
 
 		// Handling Container Sorting
@@ -221,7 +221,6 @@ const KanBanTable = ({ tableData, refetch }: KanbanTableProps) => {
 			let newItems = [...initialData]
 			newItems = arrayMove(newItems, activeContainerIndex, overContainerIndex)
 			changeInitialData(newItems)
-			console.log("Line: 204")
 		}
 
 		// Handling item dropping into Container
@@ -244,7 +243,7 @@ const KanBanTable = ({ tableData, refetch }: KanbanTableProps) => {
 			if (!activeContainer || !overContainer) return
 			// Find the index of the active and over container
 			let overIdString = over.id.toString().toUpperCase()
-			console.log("Here")
+
 			changeIssueStatus({
 				issue_id: active.id.toString(),
 				issue_status:
@@ -274,11 +273,10 @@ const KanBanTable = ({ tableData, refetch }: KanbanTableProps) => {
 			)
 			newItems[overContainerIndex].items.push(removeditem)
 			changeInitialData(newItems)
-			console.log("Line: 258")
 		}
 
 		// Handling item Sorting
-		console.log("Here")
+
 		if (active && over && active.id && over?.id && active.id !== over.id) {
 			// Find the active and over container
 			const activeContainer = initialData.find((columns) =>
@@ -297,7 +295,7 @@ const KanBanTable = ({ tableData, refetch }: KanbanTableProps) => {
 			const overContainerIndex = initialData.findIndex(
 				(container) => container.key === overContainer.key
 			)
-			console.log("Here")
+
 			// Find the index of the active and over item
 			const activeitemIndex = activeContainer.items.findIndex(
 				(item) => item.id === active.id
@@ -314,7 +312,7 @@ const KanBanTable = ({ tableData, refetch }: KanbanTableProps) => {
 					activeitemIndex,
 					overitemIndex
 				)
-				console.log("Line: 298")
+
 				changeInitialData(newItems)
 			} else {
 				// In different containers
@@ -323,10 +321,9 @@ const KanBanTable = ({ tableData, refetch }: KanbanTableProps) => {
 					activeitemIndex,
 					1
 				)
-				console.log(removeditem)
+
 				newItems[overContainerIndex].items.splice(overitemIndex, 0, removeditem)
 				changeInitialData(newItems)
-				console.log("Line: 309")
 			}
 		}
 	}

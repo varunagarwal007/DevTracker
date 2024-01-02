@@ -47,6 +47,15 @@ const formSchema = z.object({
 		required_error: "Due Date for this issue is required.",
 	}),
 	priority: z.string().transform((v) => Number(v) || 1),
+	label: z.enum([
+		"Design",
+		"Development",
+		"DevOps",
+		"Frontend",
+		"Backend",
+		"Documentation",
+		"Feature",
+	]),
 })
 
 type NewIssueFormValues = z.infer<typeof formSchema>
@@ -88,6 +97,7 @@ const CreateNewIssueForm = ({
 			original_estimate: data.original_estimate,
 			due_date: new Date(data.due_date),
 			priority: data.priority,
+			label: data.label,
 		})
 	}
 	return (
@@ -151,7 +161,10 @@ const CreateNewIssueForm = ({
 						<FormItem className="my-5">
 							<FormLabel>Original Estimate</FormLabel>
 							<FormControl>
-								<Input placeholder="Title of the new issue item" {...field} />
+								<Input
+									placeholder="Add an estimate for this task in hours"
+									{...field}
+								/>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -221,6 +234,32 @@ const CreateNewIssueForm = ({
 								</FormControl>
 								<FormMessage />
 							</div>
+						</FormItem>
+					)}
+				/>
+				<FormField
+					control={form.control}
+					name="label"
+					render={({ field }) => (
+						<FormItem className="my-5">
+							<FormLabel>Priority</FormLabel>
+							<Select onValueChange={field.onChange}>
+								<FormControl>
+									<SelectTrigger>
+										<SelectValue placeholder="Select a label of the issue" />
+									</SelectTrigger>
+								</FormControl>
+								<SelectContent>
+									<SelectItem value="Design">Design</SelectItem>
+									<SelectItem value="Development">Development</SelectItem>
+									<SelectItem value="DevOps">DevOps</SelectItem>
+									<SelectItem value="Frontend">Frontend</SelectItem>
+									<SelectItem value="Backend">Backend</SelectItem>
+									<SelectItem value="Documentation">Documentation</SelectItem>
+									<SelectItem value="Feature">Feature</SelectItem>
+								</SelectContent>
+							</Select>
+							<FormMessage />
 						</FormItem>
 					)}
 				/>

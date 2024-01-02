@@ -124,7 +124,10 @@ const Dashboard = () => {
 												width={100}
 												height={100}
 												alt="filler"
-												src="https://api.dicebear.com/7.x/shapes/svg?seed=Chester"
+												src={
+													item.picture ||
+													"https://api.dicebear.com/7.x/shapes/svg?seed=Chester"
+												}
 												className="w-full"
 											/>
 										</div>
