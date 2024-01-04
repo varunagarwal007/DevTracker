@@ -21,38 +21,51 @@ const Overview = ({ projectId }: { projectId: string }) => {
 		<div className="w-full h-full">
 			<div className="m-4 rounded-lg py-4">
 				<div className="grid grid-cols-2 gap-2 md:gap-4">
-					<div className="h-fit rounded-xl border border-primary">
-						<Chart
-							series={series}
-							options={{
-								labels: labels,
-								legend: { position: "bottom" },
-								chart: {
-									height: 200,
-								},
-							}}
-							type="pie"
-						/>
+					<div className="h-auto rounded-xl border border-primary p-4">
+						<div className="text-primary text-lg">Stats of your project.</div>
+						{projectStats && projectStats.issueCounts.length !== 0 ? (
+							<Chart
+								series={series}
+								options={{
+									labels: labels,
+									legend: { position: "bottom" },
+									chart: {
+										height: 200,
+									},
+								}}
+								type="pie"
+							/>
+						) : (
+							<div className="flex items-center justify-center w-100">
+								<span>No tasks found. No stats created</span>
+							</div>
+						)}
 					</div>
 					<div className="min-h-96 rounded-xl border border-primary space-y-4 p-4">
 						<div className="text-primary text-lg">
 							Top Priority Issues of this Project.
 						</div>
-						{projectStats.topIssues.map((i, index) => (
-							<div
-								className="w-full  h-16 bg-muted rounded-md p-2 flex flex-row items-center"
-								key={index}
-							>
-								<div className="flex flex-col">
-									<span>TASK-{i.task_number}</span>{" "}
-									<div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none border-primary focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground h-fit">
-										{i.labels ?? "Bug"}
+						{projectStats.topIssues.length !== 0 &&
+							projectStats.topIssues.map((i, index) => (
+								<div
+									className="w-full  h-16 bg-muted rounded-md p-2 flex flex-row items-center"
+									key={index}
+								>
+									<div className="flex flex-col">
+										<span>TASK-{i.task_number}</span>{" "}
+										<div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none border-primary focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground h-fit">
+											{i.labels ?? "Bug"}
+										</div>
 									</div>
-								</div>
 
-								<div className="mx-4 font-medium truncate">{i.title} </div>
+									<div className="mx-4 font-medium truncate">{i.title} </div>
+								</div>
+							))}
+						{projectStats.topIssues.length === 0 && (
+							<div className="flex items-center justify-center w-100">
+								<span>No High Priority issues found.</span>
 							</div>
-						))}
+						)}
 					</div>
 				</div>
 				<div className="flex flex-row gap-x-4 my-8">

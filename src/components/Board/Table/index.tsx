@@ -337,6 +337,10 @@ const KanBanTable = ({ tableData, refetch, search }: KanbanTableProps) => {
 		changeInitialData(tableData)
 	}, [tableData])
 
+	if (tableData && tableData.every((i) => i.items.length === 0)) {
+		return <h1 className="text-center text-lg">No task items</h1>
+	}
+
 	return (
 		<div className="grid grid-cols-4 gap-2 md:gap-4">
 			<DndContext

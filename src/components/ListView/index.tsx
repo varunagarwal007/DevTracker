@@ -164,7 +164,7 @@ const ListView = ({ projectId }: { projectId: string }) => {
 				</div>
 			) : (
 				<div className="w-full h-full grid place-content-center">
-					No task with the title &quot; ${filterInput} &quot;
+					No task found
 				</div>
 			)}
 		</div>

@@ -23,9 +23,23 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../ui/select"
+import db from "@/db"
+import { redirect, useRouter } from "next/navigation"
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "../ui/alert-dialog"
 
 const Settings = ({ projectId }: { projectId: string }) => {
 	const [newUserEmail, setNewUserEmail] = useState<string>("")
+	const router = useRouter()
 	const { data: projectMembers } = trpc.project.getProjectSettings.useQuery(
 		{
 			id: projectId,
@@ -36,6 +50,12 @@ const Settings = ({ projectId }: { projectId: string }) => {
 	const isAdmin = true
 	const { mutate, isLoading: isAdding } =
 		trpc.project.addUserToProject.useMutation()
+	const { mutate: deleteProject } = trpc.project.deleteProject.useMutation({
+		onSuccess: () => {
+			router.replace("/dashboard")
+		},
+	})
+
 	return (
 		<div className="w-full ">
 			<div className="py-2 h-20 w-full">
@@ -142,6 +162,28 @@ const Settings = ({ projectId }: { projectId: string }) => {
 						</div>
 					)}
 				</div>
+				<AlertDialog>
+					<AlertDialogTrigger asChild>
+						<Button>Delete this project</Button>
+					</AlertDialogTrigger>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+							<AlertDialogDescription>
+								This action cannot be undone. This will permanently delete your
+								project and issues associated with it.
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel>Cancel</AlertDialogCancel>
+							<AlertDialogAction
+								onClick={() => deleteProject({ id: projectId })}
+							>
+								Continue
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
 			</div>
 		</div>
 	)

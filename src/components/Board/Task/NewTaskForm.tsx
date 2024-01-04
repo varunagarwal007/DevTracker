@@ -242,7 +242,7 @@ const CreateNewIssueForm = ({
 					name="label"
 					render={({ field }) => (
 						<FormItem className="my-5">
-							<FormLabel>Priority</FormLabel>
+							<FormLabel>Label of Issue</FormLabel>
 							<Select onValueChange={field.onChange}>
 								<FormControl>
 									<SelectTrigger>

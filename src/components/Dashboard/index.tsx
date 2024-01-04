@@ -4,7 +4,7 @@ import { trpc } from "@/app/_trpc/client"
 import { Loader2, Plus, Send, Settings2 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 import { useState } from "react"
 import MaxWidthWrapper from "../MaxWidthWrapper"
 import { Button } from "../ui/button"
@@ -49,9 +49,7 @@ const Dashboard = () => {
 						<p className="leading-relaxed tracking-wide">
 							<span className="font-semibold">Pricing now available! </span>
 							<span>Head to the </span>
-							<span className="font-semibold">
-								Plans & Billings tab in any of your project to upgrade
-							</span>
+							<span className="font-semibold">Upgrade tab to upgrade.</span>
 						</p>
 					</div>
 					<Dialog>
@@ -72,30 +70,42 @@ const Dashboard = () => {
 									You will be the admin of the Project Created.
 								</DialogDescription>
 							</DialogHeader>
-							<div className="flex items-center space-x-2">
-								<div className="grid flex-1 gap-2">
-									<Label htmlFor="link" className="sr-only">
-										Link
-									</Label>
-									<Input
-										id="link"
-										placeholder="Enter a title for the Project Name."
-										onChange={(e) => setProjectName(e.target.value)}
-									/>
-								</div>
-								<Button
-									className="px-3"
-									onClick={() => createProject({ title: projectName })}
-								>
-									<Send className="w-4 h-4" />
-								</Button>
-							</div>
-							<DialogFooter className="sm:justify-start">
-								<DialogClose asChild>
-									<Button type="button" variant="secondary">
-										Close
+							{data && data?.length === 0 ? (
+								<div className="flex items-center space-x-2">
+									<div className="grid flex-1 gap-2">
+										<Label htmlFor="link" className="sr-only">
+											Link
+										</Label>
+										<Input
+											id="link"
+											placeholder="Enter a title for the Project Name."
+											onChange={(e) => setProjectName(e.target.value)}
+										/>
+									</div>
+									<Button
+										className="px-3"
+										onClick={() => createProject({ title: projectName })}
+									>
+										<Send className="w-4 h-4" />
 									</Button>
-								</DialogClose>
+								</div>
+							) : (
+								<div className="flex flex-col">
+									<h1>
+										Your Plan currently supports only one project per admin.
+									</h1>
+									<p>
+										Head over to Upgrade tab to upgrade to create more projects.
+									</p>
+								</div>
+							)}
+							<DialogFooter className="w-full flex justify-center">
+								{projectLoader ? (
+									<span className="font-semibold text-zinc-500 w-full flex items-center gap-x-3">
+										<Loader2 className="w-4 h-4 animate-spin mx-2" /> Creating
+										Your Project...
+									</span>
+								) : null}
 							</DialogFooter>
 						</DialogContent>
 					</Dialog>
@@ -133,10 +143,17 @@ const Dashboard = () => {
 													<span className="font-semibold text-lg flex-1 truncate">
 														{item.title}
 													</span>
-													<Settings2 className="w-4 h-4 text-secondary-foreground" />{" "}
+													<span
+														onClick={() =>
+															redirect(`/dashboard/${item.id}/settings`)
+														}
+													>
+														<Settings2 className="w-4 h-4 text-secondary-foreground" />
+													</span>
 												</div>
-												<p className="w-2/3 my-4">Total Issues: 0</p>
-												<p className="w-2/3">Total Members: 0</p>
+												<p className="my-4 text-muted-foreground">
+													Created At {new Date(item.createdAt).toDateString()}
+												</p>
 											</div>
 										</div>
 									</Link>
@@ -162,25 +179,37 @@ const Dashboard = () => {
 											You will be the admin of the Project Created.
 										</DialogDescription>
 									</DialogHeader>
-									<div className="flex items-center space-x-2">
-										<div className="grid flex-1 gap-2">
-											<Label htmlFor="link" className="sr-only">
-												Link
-											</Label>
-											<Input
-												id="link"
-												placeholder="Enter a title for the Project Name."
-												onChange={(e) => setProjectName(e.target.value)}
-											/>
+									{data && data.length === 0 ? (
+										<div className="flex items-center space-x-2">
+											<div className="grid flex-1 gap-2">
+												<Label htmlFor="link" className="sr-only">
+													Link
+												</Label>
+												<Input
+													id="link"
+													placeholder="Enter a title for the Project Name."
+													onChange={(e) => setProjectName(e.target.value)}
+												/>
+											</div>
+											<Button
+												className="px-3"
+												onClick={() => createProject({ title: projectName })}
+												disabled={projectLoader}
+											>
+												<Send className="w-4 h-4" />
+											</Button>
 										</div>
-										<Button
-											className="px-3"
-											onClick={() => createProject({ title: projectName })}
-											disabled={projectLoader}
-										>
-											<Send className="w-4 h-4" />
-										</Button>
-									</div>
+									) : (
+										<div className="flex flex-col">
+											<h1>
+												Your Plan currently supports only one project per admin.
+											</h1>
+											<p>
+												Head over to Upgrade tab to upgrade to create more
+												projects.
+											</p>
+										</div>
+									)}
 									<DialogFooter className="w-full flex justify-center">
 										{projectLoader ? (
 											<span className="font-semibold text-zinc-500 w-full flex items-center gap-x-3">

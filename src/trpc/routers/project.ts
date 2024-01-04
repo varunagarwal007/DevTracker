@@ -23,7 +23,6 @@ export const projectRouters = router({
 	createProject: privateProcedure
 		.input(z.object({ title: z.string() }))
 		.mutation(async ({ ctx, input }) => {
-			console.log(ctx.user)
 			const res = await db.project.create({
 				data: {
 					title: input.title,
@@ -115,5 +114,20 @@ export const projectRouters = router({
 				},
 			})
 			return { error: false }
+		}),
+	deleteProject: privateProcedure
+		.input(z.object({ id: z.string() }))
+		.mutation(async ({ ctx, input }) => {
+			const deletedIssues = await db.issues.deleteMany({
+				where: {
+					projectId: input.id,
+				},
+			})
+			const res = await db.project.delete({
+				where: {
+					id: input.id,
+				},
+			})
+			return res
 		}),
 })

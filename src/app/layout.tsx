@@ -1,11 +1,10 @@
+import NavBar from "@/components/NavBar"
+import Providers from "@/components/Providers"
+import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/toaster"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import NavBar from "@/components/NavBar"
-import Providers from "@/components/Providers"
-import { Toaster } from "@/components/ui/toaster"
-import { cn } from "@/lib/utils"
-import { ThemeProvider } from "@/components/theme-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -26,7 +25,6 @@ export default function RootLayout({
 					<ThemeProvider
 						attribute="class"
 						defaultTheme="light"
-						enableSystem
 						disableTransitionOnChange
 					>
 						<NavBar />
