@@ -104,93 +104,100 @@ const Dashboard = () => {
 					<div className=" my-2">
 						<span className="font-semibold text-lg">Your org</span>
 					</div>
-					<ul
-						role="list"
-						className="flex w-full flex-wrap items-center justify-center overflow-y-auto md:grid md:grid-cols-2 md:gap-0 lg:grid-cols-3 lg:gap-5"
-					>
-						{data?.map((item, index) => (
-							<li
-								className="col-span-1 w-full max-w-sm cursor-pointer"
-								key={index}
-							>
-								<Link href={`/dashboard/${item.id}`}>
-									<div className="relative m-2 h-64 overflow-hidden rounded-lg bg-accent border-2 border-primary border-dashed shadow shadow-secondary flex-col">
-										<div className="h-1/2 flex justify-center items-center flex-col space-y-4 border-b overflow-hidden ">
-											<Image
-												width={100}
-												height={100}
-												alt="filler"
-												src={
-													item.picture ||
-													"https://api.dicebear.com/7.x/shapes/svg?seed=Chester"
-												}
-												className="w-full"
+					{!isLoading ? (
+						<ul
+							role="list"
+							className="flex w-full flex-wrap items-center justify-center overflow-y-auto md:grid md:grid-cols-2 md:gap-0 lg:grid-cols-3 lg:gap-5"
+						>
+							{data?.map((item, index) => (
+								<li
+									className="col-span-1 w-full max-w-sm cursor-pointer"
+									key={index}
+								>
+									<Link href={`/dashboard/${item.id}`}>
+										<div className="relative m-2 h-64 overflow-hidden rounded-lg bg-accent border-2 border-primary border-dashed shadow shadow-secondary flex-col">
+											<div className="h-1/2 flex justify-center items-center flex-col space-y-4 border-b overflow-hidden ">
+												<Image
+													width={100}
+													height={100}
+													alt="filler"
+													src={
+														item.picture ||
+														"https://api.dicebear.com/7.x/shapes/svg?seed=Chester"
+													}
+													className="w-full"
+												/>
+											</div>
+											<div className="flex-col mx-6 py-2">
+												<div className="flex justify-end w-full items-center">
+													<span className="font-semibold text-lg flex-1 truncate">
+														{item.title}
+													</span>
+													<Settings2 className="w-4 h-4 text-secondary-foreground" />{" "}
+												</div>
+												<p className="w-2/3 my-4">Total Issues: 0</p>
+												<p className="w-2/3">Total Members: 0</p>
+											</div>
+										</div>
+									</Link>
+								</li>
+							))}
+							<Dialog>
+								<DialogTrigger asChild>
+									<li className="col-span-1 w-full max-w-sm cursor-pointer">
+										<div className="relative m-2 h-64 flex-col overflow-hidden rounded-lg bg-accent border-2 border-primary border-dashed shadow shadow-secondary flex justify-center items-center">
+											<div className="h-1/2 flex justify-center items-center flex-col space-y-4">
+												<span className="text-muted-foreground">
+													Create New Project
+												</span>
+												<Plus className="w-10 h-10 text-muted-foreground" />
+											</div>
+										</div>
+									</li>
+								</DialogTrigger>
+								<DialogContent className="sm:max-w-md">
+									<DialogHeader>
+										<DialogTitle>Create New Project</DialogTitle>
+										<DialogDescription>
+											You will be the admin of the Project Created.
+										</DialogDescription>
+									</DialogHeader>
+									<div className="flex items-center space-x-2">
+										<div className="grid flex-1 gap-2">
+											<Label htmlFor="link" className="sr-only">
+												Link
+											</Label>
+											<Input
+												id="link"
+												placeholder="Enter a title for the Project Name."
+												onChange={(e) => setProjectName(e.target.value)}
 											/>
 										</div>
-										<div className="flex-col mx-6 py-2">
-											<div className="flex justify-end w-full items-center">
-												<span className="font-semibold text-lg flex-1 truncate">
-													{item.title}
-												</span>
-												<Settings2 className="w-4 h-4 text-secondary-foreground" />{" "}
-											</div>
-											<p className="w-2/3 my-4">Total Issues: 0</p>
-											<p className="w-2/3">Total Members: 0</p>
-										</div>
+										<Button
+											className="px-3"
+											onClick={() => createProject({ title: projectName })}
+											disabled={projectLoader}
+										>
+											<Send className="w-4 h-4" />
+										</Button>
 									</div>
-								</Link>
-							</li>
-						))}
-						<Dialog>
-							<DialogTrigger asChild>
-								<li className="col-span-1 w-full max-w-sm cursor-pointer">
-									<div className="relative m-2 h-64 flex-col overflow-hidden rounded-lg bg-accent border-2 border-primary border-dashed shadow shadow-secondary flex justify-center items-center">
-										<div className="h-1/2 flex justify-center items-center flex-col space-y-4">
-											<span className="text-muted-foreground">
-												Create New Project
+									<DialogFooter className="w-full flex justify-center">
+										{projectLoader ? (
+											<span className="font-semibold text-zinc-500 w-full flex items-center gap-x-3">
+												<Loader2 className="w-4 h-4 animate-spin mx-2" />{" "}
+												Creating Your Project...
 											</span>
-											<Plus className="w-10 h-10 text-muted-foreground" />
-										</div>
-									</div>
-								</li>
-							</DialogTrigger>
-							<DialogContent className="sm:max-w-md">
-								<DialogHeader>
-									<DialogTitle>Create New Project</DialogTitle>
-									<DialogDescription>
-										You will be the admin of the Project Created.
-									</DialogDescription>
-								</DialogHeader>
-								<div className="flex items-center space-x-2">
-									<div className="grid flex-1 gap-2">
-										<Label htmlFor="link" className="sr-only">
-											Link
-										</Label>
-										<Input
-											id="link"
-											placeholder="Enter a title for the Project Name."
-											onChange={(e) => setProjectName(e.target.value)}
-										/>
-									</div>
-									<Button
-										className="px-3"
-										onClick={() => createProject({ title: projectName })}
-										disabled={projectLoader}
-									>
-										<Send className="w-4 h-4" />
-									</Button>
-								</div>
-								<DialogFooter className="w-full flex justify-center">
-									{projectLoader ? (
-										<span className="font-semibold text-zinc-500 w-full flex items-center gap-x-3">
-											<Loader2 className="w-4 h-4 animate-spin mx-2" /> Creating
-											Your Project...
-										</span>
-									) : null}
-								</DialogFooter>
-							</DialogContent>
-						</Dialog>
-					</ul>
+										) : null}
+									</DialogFooter>
+								</DialogContent>
+							</Dialog>
+						</ul>
+					) : (
+						<div className="flex justify-around items-center">
+							<span>Fetching your projects...</span>
+							<Loader2 className="w-4 h-4 animate-spin" />{" "}
+						</div>
+					)}
 				</div>
 			</div>
 		</MaxWidthWrapper>
