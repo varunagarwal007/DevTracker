@@ -134,7 +134,7 @@ const Page = () => {
 						return (
 							<div
 								key={plan}
-								className={cn("relative rounded-2xl bg-white shadow-lg", {
+								className={cn("relative rounded-2xl shadow-lg", {
 									"border-2 border-red-600 shadow-red-200": plan === "pro",
 									"border border-gray-200": plan !== "pro",
 								})}
@@ -154,7 +154,7 @@ const Page = () => {
 									</p>
 									<p className="text-gray-500">per month</p>
 								</div>
-								<div className="flex h-20 items-center justify-center border-b border-t border-gray-200 bg-gray-50">
+								<div className="flex h-20 items-center justify-center border-b border-t border-gray-200 bg-gray-50 dark:bg-gray-800 ">
 									<div className="flex items-center space-x-1">
 										<p>{quota.toLocaleString()} projects/user</p>
 										<Tooltip delayDuration={300}>
