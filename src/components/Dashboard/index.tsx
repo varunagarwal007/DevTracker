@@ -1,8 +1,11 @@
 "use client"
 
 import { trpc } from "@/app/_trpc/client"
-import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs"
 import { Loader2, Plus, Send, Settings2 } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 import MaxWidthWrapper from "../MaxWidthWrapper"
 import { Button } from "../ui/button"
 import {
@@ -17,14 +20,9 @@ import {
 } from "../ui/dialog"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
-import { useState } from "react"
-import Link from "next/link"
 import { useToast } from "../ui/use-toast"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
 
 const Dashboard = () => {
-	const { user } = useKindeBrowserClient()
 	const router = useRouter()
 	const { data, isLoading } = trpc.project.getProjects.useQuery()
 
@@ -104,9 +102,7 @@ const Dashboard = () => {
 				</div>
 				<div className="flex flex-col mt-16 space-y-4">
 					<div className=" my-2">
-						<span className="font-semibold text-lg">
-							{user?.given_name ?? "Your"}&apos;s org
-						</span>
+						<span className="font-semibold text-lg">Your org</span>
 					</div>
 					<ul
 						role="list"

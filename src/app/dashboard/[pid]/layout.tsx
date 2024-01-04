@@ -10,7 +10,6 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
-import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs"
 import {
 	Calendar,
 	ChevronsUpDown,
@@ -38,7 +37,7 @@ export default function DashboardLayout({
 	params: PageParams
 }) {
 	const projectId = params.pid
-	const { user } = useKindeBrowserClient()
+
 	const pathName = usePathname()
 
 	// if (!user || !user.id)

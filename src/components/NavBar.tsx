@@ -1,10 +1,9 @@
 "use client"
-import Link from "next/link"
-import React from "react"
+import { LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs/server"
 import { ArrowRight } from "lucide-react"
-import { buttonVariants } from "./ui/button"
+import Link from "next/link"
 import MaxWidthWrapper from "./MaxWidthWrapper"
-import { LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs"
+import { buttonVariants } from "./ui/button"
 
 const NavBar = () => {
 	return (

@@ -27,7 +27,7 @@ export const projectRouters = router({
 			const res = await db.project.create({
 				data: {
 					title: input.title,
-					adminId: ctx.user.id,
+					adminId: ctx.user.id!,
 					projectType: "software",
 					picture: getProjectPicture(),
 				},

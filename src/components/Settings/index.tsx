@@ -1,14 +1,9 @@
 "use client"
-import db from "@/db"
-import React, { useState } from "react"
-import { Label } from "../ui/label"
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "../ui/select"
+import { trpc } from "@/app/_trpc/client"
+import { Plus, Send } from "lucide-react"
+import { useState } from "react"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { Button } from "../ui/button"
 import {
 	Dialog,
 	DialogClose,
@@ -19,12 +14,15 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "../ui/dialog"
-import { Button } from "../ui/button"
-import { Plus, Send } from "lucide-react"
 import { Input } from "../ui/input"
-import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs"
-import { trpc } from "@/app/_trpc/client"
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { Label } from "../ui/label"
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "../ui/select"
 
 const Settings = ({ projectId }: { projectId: string }) => {
 	const [newUserEmail, setNewUserEmail] = useState<string>("")
@@ -34,9 +32,8 @@ const Settings = ({ projectId }: { projectId: string }) => {
 		},
 		{ staleTime: Infinity }
 	)
-	const { user, isLoading } = useKindeBrowserClient()
 
-	const isAdmin = !isLoading ? user.id === projectMembers?.adminId : false
+	const isAdmin = true
 	const { mutate, isLoading: isAdding } =
 		trpc.project.addUserToProject.useMutation()
 	return (
@@ -61,9 +58,11 @@ const Settings = ({ projectId }: { projectId: string }) => {
 							className="mt-4"
 							id="project_type"
 							defaultValue={"Software"}
-							placeholder="Change your project type"
 						>
-							<SelectValue defaultValue={"Software"} />
+							<SelectValue
+								defaultValue={"Software"}
+								placeholder="Change your project type"
+							/>
 						</SelectTrigger>
 						<SelectContent>
 							<SelectItem value="Software">Software</SelectItem>
